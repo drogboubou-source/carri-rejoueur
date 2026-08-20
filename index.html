@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Suivi de carrière</title>
-<meta name="description" content="Suivi de carrière joueur : buts, passes décisives et notes match par match." />
+<meta name="description" content="Suivi de carrière joueurs, année par année : niveau, potentiel, matchs, buts, passes décisives, notes." />
 <meta name="theme-color" content="#0B1220" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -20,87 +20,64 @@
     --gold:#F2B807; --gold-dark:#332B10;
     --red:#E2504A; --red-dark:#33131A;
     --blue:#4FA8E8;
+    --head:#0E2A20;
+    --row-alt:#0E1730;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
   input,select,button{font-family:'Inter',sans-serif;}
   button{cursor:pointer;}
   ::placeholder{color:var(--text-muted);}
-  #root{max-width:680px;margin:0 auto;padding:24px 16px 60px;}
+  #root{max-width:920px;margin:0 auto;padding:20px 12px 60px;}
 
-  .hero{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:20px;}
-  .shield-wrap{cursor:pointer;flex-shrink:0;}
-  .shield{
-    width:110px;height:130px;
-    background:linear-gradient(180deg,#14213D,#0E1830);
-    border:2px solid var(--green-border);
-    clip-path:polygon(50% 0%,100% 20%,100% 75%,50% 100%,0% 75%,0% 20%);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  }
-  .shield-overall{font-family:'Teko',sans-serif;font-size:44px;font-weight:600;line-height:1;color:var(--gold);}
-  .shield-pos{font-family:'Teko',sans-serif;font-size:18px;letter-spacing:1px;color:var(--green);}
-  .shield-name{font-size:10px;color:var(--text-secondary);margin-top:4px;text-align:center;padding:0 6px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .hero-stats{flex:1;min-width:260px;}
-  .hero-title{font-family:'Teko',sans-serif;font-size:32px;font-weight:600;line-height:1;}
-  .hero-sub{font-size:13px;color:var(--text-secondary);margin:2px 0 10px;}
-  .metric-row{display:flex;gap:18px;flex-wrap:wrap;}
+  .top-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+  .app-title{font-family:'Teko',sans-serif;font-size:30px;font-weight:600;line-height:1;}
+  .app-sub{font-size:12px;color:var(--text-secondary);}
 
-  .metric-value{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;}
-  .metric-label{font-size:11px;color:var(--text-secondary);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
-  .metric-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:10px 12px;text-align:center;}
-  .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
-
-  .tab-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;}
+  .tab-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;}
   .tab-row::-webkit-scrollbar{height:6px;}
   .tab-row::-webkit-scrollbar-thumb{background:#263452;border-radius:4px;}
   .tab{background:transparent;border:1px solid var(--card-border);color:var(--text-secondary);padding:6px 14px;border-radius:999px;font-size:13px;white-space:nowrap;}
   .tab.active{background:var(--green-dark);border-color:var(--green-border);color:var(--green);}
   .tab-add{background:transparent;border:1px dashed #2C3A5A;color:var(--text-muted);padding:6px 14px;border-radius:999px;font-size:13px;white-space:nowrap;}
 
-  .season-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;}
-  .season-name-input{background:transparent;border:none;color:var(--text);font-family:'Teko',sans-serif;font-size:22px;font-weight:600;outline:none;padding:2px 0;width:60%;}
+  .player-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .player-name-input{background:transparent;border:none;color:var(--text);font-family:'Teko',sans-serif;font-size:24px;font-weight:600;outline:none;padding:2px 0;min-width:160px;flex:1;}
   .link-btn{background:transparent;border:none;color:var(--text-secondary);font-size:12px;text-decoration:underline;padding:0;}
 
-  .spark-wrap{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:10px 14px;margin-bottom:18px;}
-  .spark-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--card-border);border-radius:10px;background:var(--card);}
+  table{border-collapse:collapse;width:100%;min-width:880px;font-size:13px;}
+  thead th{background:var(--head);color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;text-align:left;padding:8px 8px;border-bottom:1px solid var(--green-border);white-space:nowrap;position:sticky;top:0;}
+  tbody tr:nth-child(even){background:var(--row-alt);}
+  tbody td{padding:4px 6px;border-bottom:1px solid var(--card-border);vertical-align:middle;}
+  tfoot td{padding:8px 6px;font-weight:700;border-top:2px solid var(--green-border);background:var(--green-dark);color:var(--text);}
+  .cell-input{width:100%;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--text);padding:5px 6px;font-size:13px;outline:none;}
+  .cell-input:hover{border-color:var(--input-border);}
+  .cell-input:focus{border-color:var(--green-border);background:var(--bg);}
+  .cell-input.num{font-family:'JetBrains Mono',monospace;text-align:right;}
+  th.col-annee,td.col-annee{width:80px;}
+  th.col-club,td.col-club{min-width:180px;}
+  th.col-niveau,td.col-niveau,th.col-matchs,td.col-matchs,th.col-buts,td.col-buts,th.col-pd,td.col-pd,th.col-note,td.col-note{width:60px;}
+  th.col-potentiel,td.col-potentiel{width:90px;}
+  th.col-titre,td.col-titre{min-width:160px;}
+  th.col-objectif,td.col-objectif{width:70px;}
+  .del-cell{width:32px;text-align:center;}
+  .del-btn{background:transparent;border:none;color:var(--text-muted);font-size:16px;line-height:1;padding:2px 4px;}
+  .del-btn:hover{color:var(--red);}
+  .note-cell{font-weight:700;font-family:'JetBrains Mono',monospace;}
 
-  .log-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .log-title{font-family:'Teko',sans-serif;font-size:22px;font-weight:600;}
+  .add-row-bar{padding:8px;}
   .add-btn{background:var(--green-dark);border:1px solid var(--green-border);color:var(--green);padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;}
 
-  .form{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:16px;margin-bottom:16px;}
-  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-  .field{display:flex;flex-direction:column;gap:4px;}
-  .field-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;}
-  .field-row{display:flex;flex-direction:row;align-items:center;gap:8px;padding-top:18px;}
-  input[type=text],input[type=number],select{background:var(--bg);border:1px solid var(--input-border);border-radius:6px;color:var(--text);padding:8px 10px;font-size:13px;outline:none;width:100%;}
-  .error-text{color:var(--red);font-size:12px;margin-top:8px;}
-  .submit-btn{margin-top:14px;background:var(--green);border:none;color:#08130D;font-weight:600;padding:9px 18px;border-radius:8px;font-size:13px;}
-
-  .match-list{display:flex;flex-direction:column;gap:8px;}
-  .empty-state{color:var(--text-muted);font-size:13px;text-align:center;padding:24px 0;}
-  .match-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:10px 12px;}
-  .res-badge{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
-  .res-w{background:var(--green-dark);color:var(--green);}
-  .res-l{background:var(--red-dark);color:var(--red);}
-  .res-d{background:var(--gold-dark);color:var(--gold);}
-  .res-n{background:#1A2033;color:var(--text-muted);}
-  .match-info{flex:1;min-width:0;}
-  .match-opp{font-size:14px;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .match-meta{font-size:11px;color:var(--text-secondary);margin-top:1px;}
-  .match-stats{display:flex;gap:4px;flex-shrink:0;}
-  .stat-pill{font-size:10px;color:var(--text-secondary);border:1px solid var(--input-border);border-radius:999px;padding:2px 7px;font-family:'JetBrains Mono',monospace;}
-  .stat-pill.motm{color:var(--gold);border-color:#4A3B0F;}
-  .rating-badge{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;width:34px;text-align:center;flex-shrink:0;}
-  .del-btn{background:transparent;border:none;color:var(--text-muted);font-size:18px;line-height:1;flex-shrink:0;padding:0 2px;}
-
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;}
-  .modal{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:20px;width:300px;max-width:100%;display:flex;flex-direction:column;gap:12px;}
-  .modal-title{font-family:'Teko',sans-serif;font-size:22px;font-weight:600;margin-bottom:4px;}
+  .career-summary{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0 18px;}
+  .summary-item{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:8px 14px;text-align:center;min-width:80px;}
+  .summary-value{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:18px;}
+  .summary-label{font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
 
   .install-bar{position:sticky;top:0;background:var(--green-dark);border-bottom:1px solid var(--green-border);color:var(--green);font-size:13px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:40;}
   .install-bar button{background:var(--green);border:none;color:#08130D;font-weight:600;padding:6px 12px;border-radius:6px;font-size:12px;}
   .hidden{display:none !important;}
+  .empty-state{color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;}
 </style>
 </head>
 <body>
@@ -113,285 +90,194 @@
 <script>
 /* ---------- Utils ---------- */
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-const POSITIONS = ["GB","DC","DD","DG","MDC","MC","MOC","AiD","AiG","BU"];
-const COMPETITIONS = ["Championnat","Coupe nationale","Coupe de la ligue","Ligue des champions","Amical"];
-const emptyProfile = () => ({ name: "Mon joueur", position: "BU", club: "", nation: "", overall: 65 });
-const emptyMatch = () => ({ id: uid(), matchday:"", opponent:"", competition:"Championnat", scoreFor:"", scoreAgainst:"", minutes:90, goals:0, assists:0, rating:7.0, motm:false });
+const emptyYear = () => ({ id: uid(), age:"", club:"", niveau:"", potentiel:"", matches:"", buts:"", pd:"", note:"", titre:"", objectif:"" });
+const emptyPlayer = (n) => ({ id: uid(), name: n || "Nouveau joueur", years: [emptyYear()] });
 
 function loadJSON(key, fallback){
   try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
   catch(e){ return fallback; }
 }
-function save(){
-  localStorage.setItem('fifaCareerProfile', JSON.stringify(state.profile));
-  localStorage.setItem('fifaCareerSeasons', JSON.stringify(state.seasons));
-}
+function save(){ localStorage.setItem('fifaCareerPlayers', JSON.stringify(state.players)); }
+
+function num(v){ const n = parseFloat(String(v).replace(',', '.')); return isNaN(n) ? 0 : n; }
+function fmtNote(n){ return n.toFixed(2).replace('.', ','); }
 
 /* ---------- State ---------- */
 const state = {
-  profile: loadJSON('fifaCareerProfile', emptyProfile()),
-  seasons: loadJSON('fifaCareerSeasons', [{ id: uid(), label: "Saison 1", matches: [] }]),
-  seasonId: null,
-  showForm: false,
-  editingProfile: false,
-  formError: "",
+  players: loadJSON('fifaCareerPlayers', [emptyPlayer("Joueur 1")]),
+  playerId: null,
 };
-state.seasonId = state.seasons[0].id;
+if(!state.players.length) state.players = [emptyPlayer("Joueur 1")];
+state.playerId = state.players[0].id;
 
-/* ---------- Derived ---------- */
-function currentSeason(){ return state.seasons.find(s => s.id === state.seasonId) || state.seasons[0]; }
-function aggregate(matches){
-  const apps = matches.length;
-  const goals = matches.reduce((a,m)=>a+Number(m.goals||0),0);
-  const assists = matches.reduce((a,m)=>a+Number(m.assists||0),0);
-  const motm = matches.filter(m=>m.motm).length;
-  const avgRating = apps ? matches.reduce((a,m)=>a+Number(m.rating||0),0)/apps : 0;
-  return { apps, goals, assists, motm, avgRating };
-}
-function resultBadge(m){
-  if(m.scoreFor==="" || m.scoreAgainst==="") return {label:"-",cls:"res-n"};
-  const f=Number(m.scoreFor), a=Number(m.scoreAgainst);
-  if(f>a) return {label:"V",cls:"res-w"};
-  if(f<a) return {label:"D",cls:"res-l"};
-  return {label:"N",cls:"res-d"};
-}
-function ratingColor(r){
-  if(r>=8.5) return "var(--gold)";
-  if(r>=7) return "var(--green)";
-  if(r>=6) return "var(--text-secondary)";
-  return "var(--red)";
-}
-function esc(str){
-  return String(str==null?"":str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function currentPlayer(){ return state.players.find(p => p.id === state.playerId) || state.players[0]; }
+
+function totals(years){
+  let matches=0, buts=0, pd=0, weighted=0;
+  years.forEach(y => {
+    const m = num(y.matches);
+    matches += m; buts += num(y.buts); pd += num(y.pd);
+    weighted += num(y.note) * m;
+  });
+  const avgNote = matches ? weighted / matches : 0;
+  return { matches, buts, pd, avgNote };
 }
 
 /* ---------- Render ---------- */
 function render(){
   const root = document.getElementById('root');
-  const season = currentSeason();
-  const seasonStats = aggregate(season ? season.matches : []);
-  const careerMatches = state.seasons.flatMap(s => s.matches);
-  const careerStats = aggregate(careerMatches);
+  const player = currentPlayer();
+  const t = totals(player.years);
 
   root.innerHTML = `
-    <div class="hero">
-      <div class="shield-wrap" id="shield-btn" title="Modifier le profil">
-        <div class="shield">
-          <div class="shield-overall">${esc(state.profile.overall)}</div>
-          <div class="shield-pos">${esc(state.profile.position)}</div>
-          <div class="shield-name">${esc(state.profile.name)}</div>
-        </div>
-      </div>
-      <div class="hero-stats">
-        <div class="hero-title">Carrière</div>
-        <div class="hero-sub">${esc(state.profile.club || "Aucun club")}${state.profile.nation ? " · " + esc(state.profile.nation) : ""}</div>
-        <div class="metric-row">
-          ${metric("Matchs", careerStats.apps)}
-          ${metric("Buts", careerStats.goals, "var(--green)")}
-          ${metric("Passes D.", careerStats.assists, "var(--blue)")}
-          ${metric("Note moy.", careerStats.avgRating.toFixed(2), "var(--gold)")}
-          ${metric("MOTM", careerStats.motm, "var(--gold)")}
-        </div>
+    <div class="top-row">
+      <div>
+        <div class="app-title">Suivi de carrière</div>
+        <div class="app-sub">Progression année par année</div>
       </div>
     </div>
 
     <div class="tab-row">
-      ${state.seasons.map(s => `<button class="tab ${s.id===state.seasonId?'active':''}" data-action="select-season" data-id="${s.id}">${esc(s.label)}</button>`).join("")}
-      <button class="tab-add" data-action="add-season">+ saison</button>
+      ${state.players.map(p => `<button class="tab ${p.id===state.playerId?'active':''}" data-action="select-player" data-id="${p.id}">${esc(p.name)}</button>`).join("")}
+      <button class="tab-add" data-action="add-player">+ joueur</button>
     </div>
 
-    ${season ? `
-    <div class="season-header">
-      <input class="season-name-input" id="season-name-input" value="${esc(season.label)}" />
-      ${state.seasons.length>1 ? `<button class="link-btn" data-action="delete-season">Supprimer cette saison</button>` : ""}
-    </div>` : ""}
-
-    <div class="metric-grid">
-      ${metric("Matchs", seasonStats.apps, null, true)}
-      ${metric("Buts", seasonStats.goals, "var(--green)", true)}
-      ${metric("Passes D.", seasonStats.assists, "var(--blue)", true)}
-      ${metric("Note moy.", seasonStats.apps ? seasonStats.avgRating.toFixed(2) : "-", "var(--gold)", true)}
+    <div class="player-header">
+      <input class="player-name-input" id="player-name-input" value="${esc(player.name)}" />
+      ${state.players.length>1 ? `<button class="link-btn" data-action="delete-player">Supprimer ce joueur</button>` : ""}
     </div>
 
-    ${sparkline(season)}
-
-    <div class="log-header">
-      <div class="log-title">Matchs — ${esc(season ? season.label : "")}</div>
-      <button class="add-btn" data-action="toggle-form">${state.showForm ? "Annuler" : "+ Ajouter un match"}</button>
+    <div class="career-summary">
+      ${summary("Années", player.years.length)}
+      ${summary("Matchs", t.matches)}
+      ${summary("Buts", t.buts, "var(--green)")}
+      ${summary("PD", t.pd, "var(--blue)")}
+      ${summary("Note moy.", t.matches ? fmtNote(t.avgNote) : "-", "var(--gold)")}
     </div>
 
-    ${state.showForm ? matchForm() : ""}
-
-    <div class="match-list">
-      ${season && season.matches.length===0 ? `<div class="empty-state">Aucun match enregistré pour cette saison. Ajoute ton premier match.</div>` : ""}
-      ${season ? [...season.matches].reverse().map(matchRow).join("") : ""}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-annee">Année</th>
+            <th class="col-club">Club</th>
+            <th class="col-niveau">Niveau</th>
+            <th class="col-potentiel">Potentiel</th>
+            <th class="col-matchs">Matchs</th>
+            <th class="col-buts">Buts</th>
+            <th class="col-pd">PD</th>
+            <th class="col-note">Note</th>
+            <th class="col-titre">Titre</th>
+            <th class="col-objectif">Objectif</th>
+            <th class="del-cell"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${player.years.length ? player.years.map(yearRow).join("") : `<tr><td colspan="11" class="empty-state">Aucune année enregistrée.</td></tr>`}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4">TOTAL</td>
+            <td>${t.matches}</td>
+            <td>${t.buts}</td>
+            <td>${t.pd}</td>
+            <td>${t.matches ? fmtNote(t.avgNote) : "-"}</td>
+            <td colspan="3"></td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
-
-    ${state.editingProfile ? profileModal() : ""}
+    <div class="add-row-bar">
+      <button class="add-btn" data-action="add-year">+ Ajouter une année</button>
+    </div>
   `;
 
   attachEvents();
 }
 
-function metric(label, value, accent, card){
-  return `<div class="${card ? 'metric-card' : ''}">
-    <div class="metric-value" style="color:${accent || 'var(--text)'}">${esc(value)}</div>
-    <div class="metric-label">${esc(label)}</div>
+function summary(label, value, accent){
+  return `<div class="summary-item">
+    <div class="summary-value" style="color:${accent || 'var(--text)'}">${esc(value)}</div>
+    <div class="summary-label">${esc(label)}</div>
   </div>`;
 }
 
-function sparkline(season){
-  if(!season || season.matches.length < 2) return "";
-  const w=620,h=90,pad=8,ms=season.matches;
-  const points = ms.map((m,i) => {
-    const x = pad + (i*(w-pad*2))/(ms.length-1);
-    const y = h-pad-((Number(m.rating)-0)/10)*(h-pad*2);
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(" ");
-  return `<div class="spark-wrap">
-    <div class="spark-label">Évolution de la note</div>
-    <svg viewBox="0 0 620 90" width="100%" height="70" preserveAspectRatio="none">
-      <polyline points="${points}" fill="none" stroke="var(--green)" stroke-width="2" />
-    </svg>
-  </div>`;
+function yearRow(y){
+  return `<tr data-year-id="${y.id}">
+    <td class="col-annee"><input class="cell-input" data-field="age" value="${esc(y.age)}" placeholder="16 ans" /></td>
+    <td class="col-club"><input class="cell-input" data-field="club" value="${esc(y.club)}" placeholder="Nom du club (pays)" /></td>
+    <td class="col-niveau"><input class="cell-input num" data-field="niveau" value="${esc(y.niveau)}" placeholder="0" /></td>
+    <td class="col-potentiel"><input class="cell-input" data-field="potentiel" value="${esc(y.potentiel)}" placeholder="50 +5" /></td>
+    <td class="col-matchs"><input class="cell-input num" type="number" min="0" data-field="matches" value="${esc(y.matches)}" placeholder="0" /></td>
+    <td class="col-buts"><input class="cell-input num" type="number" min="0" data-field="buts" value="${esc(y.buts)}" placeholder="0" /></td>
+    <td class="col-pd"><input class="cell-input num" type="number" min="0" data-field="pd" value="${esc(y.pd)}" placeholder="0" /></td>
+    <td class="col-note note-cell" style="color:${ratingColor(num(y.note))}"><input class="cell-input num" type="number" min="0" max="10" step="0.1" data-field="note" value="${esc(y.note)}" placeholder="0" /></td>
+    <td class="col-titre"><input class="cell-input" data-field="titre" value="${esc(y.titre)}" placeholder="—" /></td>
+    <td class="col-objectif"><input class="cell-input" data-field="objectif" value="${esc(y.objectif)}" placeholder="0/4" /></td>
+    <td class="del-cell"><button class="del-btn" data-action="delete-year" data-id="${y.id}" aria-label="Supprimer l'année">×</button></td>
+  </tr>`;
 }
 
-function matchForm(){
-  return `<form class="form" id="match-form">
-    <div class="form-grid">
-      <label class="field"><span class="field-label">Journée</span><input type="text" id="f-matchday" placeholder="1" /></label>
-      <label class="field" style="grid-column:span 2"><span class="field-label">Adversaire</span><input type="text" id="f-opponent" placeholder="Nom de l'équipe" /></label>
-      <label class="field"><span class="field-label">Compétition</span>
-        <select id="f-competition">${COMPETITIONS.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("")}</select>
-      </label>
-      <label class="field"><span class="field-label">Buts pour</span><input type="number" min="0" id="f-scorefor" /></label>
-      <label class="field"><span class="field-label">Buts contre</span><input type="number" min="0" id="f-scoreagainst" /></label>
-      <label class="field"><span class="field-label">Minutes</span><input type="number" min="0" max="120" id="f-minutes" value="90" /></label>
-      <label class="field"><span class="field-label">Buts</span><input type="number" min="0" id="f-goals" value="0" /></label>
-      <label class="field"><span class="field-label">Passes D.</span><input type="number" min="0" id="f-assists" value="0" /></label>
-      <label class="field"><span class="field-label">Note</span><input type="number" min="0" max="10" step="0.1" id="f-rating" value="7.0" /></label>
-      <label class="field field-row"><input type="checkbox" id="f-motm" /><span class="field-label">Homme du match</span></label>
-    </div>
-    ${state.formError ? `<div class="error-text">${esc(state.formError)}</div>` : ""}
-    <button type="submit" class="submit-btn">Enregistrer le match</button>
-  </form>`;
+function ratingColor(r){
+  if(!r) return "var(--text)";
+  if(r>=8.5) return "var(--gold)";
+  if(r>=7) return "var(--green)";
+  if(r>=6) return "var(--text-secondary)";
+  return "var(--red)";
 }
 
-function matchRow(m){
-  const res = resultBadge(m);
-  return `<div class="match-row">
-    <div class="res-badge ${res.cls}">${res.label}</div>
-    <div class="match-info">
-      <div class="match-opp">${esc(m.opponent || "Adversaire")}</div>
-      <div class="match-meta">${m.matchday ? "J"+esc(m.matchday)+" · " : ""}${esc(m.competition)}${m.scoreFor!=="" && m.scoreAgainst!=="" ? " · "+esc(m.scoreFor)+"-"+esc(m.scoreAgainst) : ""}</div>
-    </div>
-    <div class="match-stats">
-      <span class="stat-pill">${esc(m.goals)}B</span>
-      <span class="stat-pill">${esc(m.assists)}PD</span>
-      ${m.motm ? `<span class="stat-pill motm">MOTM</span>` : ""}
-    </div>
-    <div class="rating-badge" style="color:${ratingColor(Number(m.rating))}">${Number(m.rating).toFixed(1)}</div>
-    <button class="del-btn" data-action="delete-match" data-id="${m.id}" aria-label="Supprimer">×</button>
-  </div>`;
-}
-
-function profileModal(){
-  const p = state.profile;
-  return `<div class="modal-overlay" id="modal-overlay">
-    <div class="modal" id="modal-inner">
-      <div class="modal-title">Profil du joueur</div>
-      <label class="field"><span class="field-label">Nom</span><input type="text" id="p-name" value="${esc(p.name)}" /></label>
-      <label class="field"><span class="field-label">Poste</span>
-        <select id="p-position">${POSITIONS.map(pos=>`<option value="${pos}" ${pos===p.position?'selected':''}>${pos}</option>`).join("")}</select>
-      </label>
-      <label class="field"><span class="field-label">Club</span><input type="text" id="p-club" value="${esc(p.club)}" /></label>
-      <label class="field"><span class="field-label">Nation</span><input type="text" id="p-nation" value="${esc(p.nation)}" /></label>
-      <label class="field"><span class="field-label">Note globale</span><input type="number" min="40" max="99" id="p-overall" value="${esc(p.overall)}" /></label>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button class="submit-btn" id="p-save">Enregistrer</button>
-        <button class="link-btn" id="p-cancel">Annuler</button>
-      </div>
-    </div>
-  </div>`;
+function esc(str){
+  return String(str==null?"":str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 /* ---------- Events ---------- */
 function attachEvents(){
   const root = document.getElementById('root');
 
-  root.querySelectorAll('[data-action="select-season"]').forEach(el => {
-    el.addEventListener('click', () => { state.seasonId = el.dataset.id; state.showForm=false; render(); });
+  root.querySelectorAll('[data-action="select-player"]').forEach(el => {
+    el.addEventListener('click', () => { state.playerId = el.dataset.id; render(); });
   });
-  const addSeasonBtn = root.querySelector('[data-action="add-season"]');
-  if(addSeasonBtn) addSeasonBtn.addEventListener('click', () => {
-    const s = { id: uid(), label: `Saison ${state.seasons.length+1}`, matches: [] };
-    state.seasons.push(s); state.seasonId = s.id; save(); render();
+  const addPlayerBtn = root.querySelector('[data-action="add-player"]');
+  if(addPlayerBtn) addPlayerBtn.addEventListener('click', () => {
+    const p = emptyPlayer(`Joueur ${state.players.length+1}`);
+    state.players.push(p); state.playerId = p.id; save(); render();
   });
-  const delSeasonBtn = root.querySelector('[data-action="delete-season"]');
-  if(delSeasonBtn) delSeasonBtn.addEventListener('click', () => {
-    if(state.seasons.length<=1) return;
-    state.seasons = state.seasons.filter(s => s.id !== state.seasonId);
-    state.seasonId = state.seasons[0].id; save(); render();
+  const delPlayerBtn = root.querySelector('[data-action="delete-player"]');
+  if(delPlayerBtn) delPlayerBtn.addEventListener('click', () => {
+    if(state.players.length<=1) return;
+    state.players = state.players.filter(p => p.id !== state.playerId);
+    state.playerId = state.players[0].id; save(); render();
   });
-  const seasonNameInput = root.querySelector('#season-name-input');
-  if(seasonNameInput) seasonNameInput.addEventListener('change', () => {
-    const s = currentSeason(); if(s){ s.label = seasonNameInput.value || s.label; save(); }
-  });
-
-  const toggleFormBtn = root.querySelector('[data-action="toggle-form"]');
-  if(toggleFormBtn) toggleFormBtn.addEventListener('click', () => { state.showForm = !state.showForm; state.formError=""; render(); });
-
-  const form = root.querySelector('#match-form');
-  if(form) form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const opponent = root.querySelector('#f-opponent').value.trim();
-    const rating = parseFloat(root.querySelector('#f-rating').value);
-    if(!opponent){ state.formError = "Indique un adversaire"; render(); return; }
-    if(isNaN(rating) || rating<0 || rating>10){ state.formError = "La note doit être entre 0 et 10"; render(); return; }
-    const m = {
-      id: uid(),
-      matchday: root.querySelector('#f-matchday').value,
-      opponent,
-      competition: root.querySelector('#f-competition').value,
-      scoreFor: root.querySelector('#f-scorefor').value,
-      scoreAgainst: root.querySelector('#f-scoreagainst').value,
-      minutes: root.querySelector('#f-minutes').value,
-      goals: root.querySelector('#f-goals').value,
-      assists: root.querySelector('#f-assists').value,
-      rating,
-      motm: root.querySelector('#f-motm').checked,
-    };
-    currentSeason().matches.push(m);
-    state.showForm = false; state.formError = "";
-    save(); render();
+  const nameInput = root.querySelector('#player-name-input');
+  if(nameInput) nameInput.addEventListener('change', () => {
+    const p = currentPlayer(); p.name = nameInput.value || p.name; save();
   });
 
-  root.querySelectorAll('[data-action="delete-match"]').forEach(el => {
-    el.addEventListener('click', () => {
-      const s = currentSeason();
-      s.matches = s.matches.filter(m => m.id !== el.dataset.id);
-      save(); render();
+  const addYearBtn = root.querySelector('[data-action="add-year"]');
+  if(addYearBtn) addYearBtn.addEventListener('click', () => {
+    currentPlayer().years.push(emptyYear()); save(); render();
+  });
+
+  root.querySelectorAll('tbody tr[data-year-id]').forEach(tr => {
+    const yearId = tr.dataset.yearId;
+    const year = currentPlayer().years.find(y => y.id === yearId);
+    tr.querySelectorAll('[data-field]').forEach(inp => {
+      inp.addEventListener('change', () => {
+        year[inp.dataset.field] = inp.value;
+        save();
+        if(inp.dataset.field === 'matches' || inp.dataset.field === 'note'){
+          render();
+        }
+      });
     });
   });
 
-  const shieldBtn = root.querySelector('#shield-btn');
-  if(shieldBtn) shieldBtn.addEventListener('click', () => { state.editingProfile = true; render(); });
-
-  const overlay = root.querySelector('#modal-overlay');
-  if(overlay) overlay.addEventListener('click', (e) => { if(e.target === overlay){ state.editingProfile=false; render(); } });
-  const pCancel = root.querySelector('#p-cancel');
-  if(pCancel) pCancel.addEventListener('click', () => { state.editingProfile=false; render(); });
-  const pSave = root.querySelector('#p-save');
-  if(pSave) pSave.addEventListener('click', () => {
-    state.profile = {
-      name: root.querySelector('#p-name').value || "Mon joueur",
-      position: root.querySelector('#p-position').value,
-      club: root.querySelector('#p-club').value,
-      nation: root.querySelector('#p-nation').value,
-      overall: Number(root.querySelector('#p-overall').value) || 65,
-    };
-    state.editingProfile = false;
-    save(); render();
+  root.querySelectorAll('[data-action="delete-year"]').forEach(el => {
+    el.addEventListener('click', () => {
+      const p = currentPlayer();
+      p.years = p.years.filter(y => y.id !== el.dataset.id);
+      save(); render();
+    });
   });
 }
 
@@ -408,7 +294,7 @@ const iconDataUri = "data:image/svg+xml;base64," + btoa(iconSvg);
 const manifest = {
   name: "Suivi de carrière",
   short_name: "Carrière",
-  description: "Suivi de carrière joueur : buts, passes décisives et notes match par match.",
+  description: "Suivi de carrière joueurs, année par année.",
   start_url: ".",
   scope: ".",
   display: "standalone",
@@ -425,7 +311,7 @@ document.getElementById('apple-icon-link').href = iconDataUri;
 
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   const swSource = `
-    const CACHE = 'carriere-v1';
+    const CACHE = 'carriere-v2';
     self.addEventListener('install', e => {
       self.skipWaiting();
       e.waitUntil(caches.open(CACHE).then(c => c.add(self.registration.scope)));
