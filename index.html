@@ -38,10 +38,19 @@
   .link-btn{background:transparent;border:none;color:var(--text-secondary);font-size:11px;text-decoration:underline;padding:0;}
 
   /* HERO BANNER */
-  .banner{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:linear-gradient(120deg,#0C1730 0%,#0E1A38 45%,#170F1C 100%);padding:18px 20px;margin-bottom:14px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
-  .banner::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg, rgba(59,130,246,0.14), transparent 40%, rgba(226,80,74,0.14));pointer-events:none;}
+  .banner{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:linear-gradient(120deg,#0C1730 0%,#0E1A38 45%,#170F1C 100%);padding:18px 20px;margin-bottom:14px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;min-height:118px;}
+  .banner::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg, rgba(59,130,246,0.14), transparent 40%, rgba(226,80,74,0.14));pointer-events:none;z-index:0;}
+  .banner.has-photo{padding-left:150px;}
+  .photo-bleed{position:absolute;left:0;top:0;bottom:0;width:170px;overflow:hidden;z-index:0;}
+  .photo-bleed img{width:100%;height:100%;object-fit:cover;object-position:top center;filter:saturate(1.05) contrast(1.03);
+    -webkit-mask-image:linear-gradient(100deg, black 45%, transparent 92%);
+    mask-image:linear-gradient(100deg, black 45%, transparent 92%);}
   .avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--red));display:flex;align-items:center;justify-content:center;font-family:'Teko',sans-serif;font-size:26px;font-weight:600;color:#fff;flex-shrink:0;position:relative;z-index:1;}
   .banner-mid{flex:1;min-width:200px;position:relative;z-index:1;}
+  .photo-field{margin-top:6px;}
+  .photo-field input{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:10.5px;padding:4px 8px;width:100%;max-width:340px;outline:none;}
+  .photo-field input:focus{border-color:var(--blue);color:var(--text);}
+  .photo-field-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;}
   .player-name{font-family:'Teko',sans-serif;font-weight:700;font-size:clamp(28px,5vw,44px);line-height:1;background:linear-gradient(90deg,#EAF0FB 0%,#9CC1FF 45%,#F0908B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:0.5px;border:none;outline:none;width:100%;padding:2px 0;}
   .name-sub{display:flex;align-items:center;gap:8px;margin-top:2px;flex-wrap:wrap;}
   .name-sub-text{font-size:12px;color:var(--text-secondary);}
@@ -145,7 +154,7 @@ const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 
 const emptyYear = () => ({ id: uid(), age:"", club:"", niveau:"", potentiel:"", potentielDelta:"", matches:"", buts:"", pd:"", note:"", objectif:"", contrat:"" });
 const emptyGoal = (t) => ({ id: uid(), text: t || "" });
 const emptyPlayer = (n) => ({
-  id: uid(), name: n || "Nouveau joueur",
+  id: uid(), name: n || "Nouveau joueur", photoUrl:"",
   currentClub:"", currentLeague:"", dreamClub:"", dreamLeague:"",
   goals: [emptyGoal("Rêve ultime : être recruté par un grand club")],
   years: [emptyYear()],
@@ -162,7 +171,7 @@ function migrateOld(){
   if(!old || !old.length) return null;
   return old.map(p => ({
     id: p.id || uid(),
-    name: p.name || "Joueur",
+    name: p.name || "Joueur", photoUrl:"",
     currentClub:"", currentLeague:"", dreamClub:"", dreamLeague:"",
     goals: [emptyGoal("Rêve ultime : être recruté par un grand club")],
     years: (p.years||[]).map(y => ({
@@ -190,6 +199,7 @@ const state = {
   playerId: null,
 };
 if(!state.players.length) state.players = [emptyPlayer("Joueur 1")];
+state.players.forEach(p => { if(typeof p.photoUrl !== 'string') p.photoUrl = ""; });
 state.playerId = state.players[0].id;
 save();
 
@@ -260,14 +270,23 @@ function render(){
       <button class="tab-add" data-action="add-player">+ joueur</button>
     </div>
 
-    <div class="banner">
-      <div class="avatar">${esc(initials(player.name))}</div>
+    <div class="banner ${player.photoUrl ? 'has-photo' : ''}">
+      ${player.photoUrl ? `
+        <div class="photo-bleed">
+          <img src="${esc(encodeURI(player.photoUrl))}" alt="Photo de ${esc(player.name)}" onerror="this.closest('.banner').classList.remove('has-photo'); this.parentElement.style.display='none'; this.closest('.banner').querySelector('.avatar-fallback').style.display='flex';" />
+        </div>
+        <div class="avatar avatar-fallback" style="display:none">${esc(initials(player.name))}</div>
+      ` : `<div class="avatar">${esc(initials(player.name))}</div>`}
       <div class="banner-mid">
         <input class="player-name" id="player-name-input" value="${esc(player.name)}" />
         <div class="name-sub">
           <span class="name-sub-text">Plan de carrière du joueur</span>
           <span class="mode-pill">Mode RP</span>
           ${state.players.length>1 ? `<button class="link-btn" data-action="delete-player">Supprimer ce joueur</button>` : ""}
+        </div>
+        <div class="photo-field">
+          <div class="photo-field-label">Photo (chemin du fichier, ex. images/nom.png)</div>
+          <input id="photo-url-input" value="${esc(player.photoUrl)}" placeholder="images/ma-photo.png" />
         </div>
       </div>
       <div class="club-track">
@@ -471,6 +490,8 @@ function attachEvents(){
   if(dcInput) dcInput.addEventListener('change', () => { currentPlayer().dreamClub = dcInput.value; save(); render(); });
   const dlInput = root.querySelector('#dream-league-input');
   if(dlInput) dlInput.addEventListener('change', () => { currentPlayer().dreamLeague = dlInput.value; save(); });
+  const photoInput = root.querySelector('#photo-url-input');
+  if(photoInput) photoInput.addEventListener('change', () => { currentPlayer().photoUrl = photoInput.value.trim(); save(); render(); });
 
   const addYearBtn = root.querySelector('[data-action="add-year"]');
   if(addYearBtn) addYearBtn.addEventListener('click', () => { currentPlayer().years.push(emptyYear()); save(); render(); });
