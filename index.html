@@ -30,49 +30,49 @@
   ::placeholder{color:var(--text-muted);}
   #root{max-width:920px;margin:0 auto;padding:20px 12px 60px;}
 
-  .top-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
-  .app-title{font-family:'Teko',sans-serif;font-size:30px;font-weight:600;line-height:1;}
-  .app-sub{font-size:12px;color:var(--text-secondary);}
+  .top-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+  .app-title{font-family:'Teko',sans-serif;font-size:24px;font-weight:600;line-height:1;}
+  .app-sub{font-size:11px;color:var(--text-secondary);}
 
   .tab-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;}
   .tab-row::-webkit-scrollbar{height:6px;}
   .tab-row::-webkit-scrollbar-thumb{background:#263452;border-radius:4px;}
-  .tab{background:transparent;border:1px solid var(--card-border);color:var(--text-secondary);padding:6px 14px;border-radius:999px;font-size:13px;white-space:nowrap;}
+  .tab{background:transparent;border:1px solid var(--card-border);color:var(--text-secondary);padding:5px 12px;border-radius:999px;font-size:12px;white-space:nowrap;}
   .tab.active{background:var(--green-dark);border-color:var(--green-border);color:var(--green);}
-  .tab-add{background:transparent;border:1px dashed #2C3A5A;color:var(--text-muted);padding:6px 14px;border-radius:999px;font-size:13px;white-space:nowrap;}
+  .tab-add{background:transparent;border:1px dashed #2C3A5A;color:var(--text-muted);padding:5px 12px;border-radius:999px;font-size:12px;white-space:nowrap;}
 
   .player-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
-  .player-name-input{background:transparent;border:none;color:var(--text);font-family:'Teko',sans-serif;font-size:24px;font-weight:600;outline:none;padding:2px 0;min-width:160px;flex:1;}
+  .player-name-input{background:transparent;border:none;color:var(--text);font-family:'Teko',sans-serif;font-size:20px;font-weight:600;outline:none;padding:2px 0;min-width:140px;flex:1;}
   .link-btn{background:transparent;border:none;color:var(--text-secondary);font-size:12px;text-decoration:underline;padding:0;}
 
   .table-wrap{overflow-x:auto;border:1px solid var(--card-border);border-radius:10px;background:var(--card);}
-  table{border-collapse:collapse;width:100%;min-width:880px;font-size:13px;}
-  thead th{background:var(--head);color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;text-align:left;padding:8px 8px;border-bottom:1px solid var(--green-border);white-space:nowrap;position:sticky;top:0;}
+  table{border-collapse:collapse;width:100%;min-width:620px;font-size:11px;}
+  thead th{background:var(--head);color:var(--green);font-size:9px;text-transform:uppercase;letter-spacing:0.3px;font-weight:600;text-align:left;padding:6px 4px;border-bottom:1px solid var(--green-border);white-space:nowrap;position:sticky;top:0;}
   tbody tr:nth-child(even){background:var(--row-alt);}
-  tbody td{padding:4px 6px;border-bottom:1px solid var(--card-border);vertical-align:middle;}
-  tfoot td{padding:8px 6px;font-weight:700;border-top:2px solid var(--green-border);background:var(--green-dark);color:var(--text);}
-  .cell-input{width:100%;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--text);padding:5px 6px;font-size:13px;outline:none;}
+  tbody td{padding:1px 3px;border-bottom:1px solid var(--card-border);vertical-align:middle;}
+  tfoot td{padding:6px 4px;font-size:11px;font-weight:700;border-top:2px solid var(--green-border);background:var(--green-dark);color:var(--text);}
+  .cell-input{width:100%;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--text);padding:4px 4px;font-size:11px;outline:none;}
   .cell-input:hover{border-color:var(--input-border);}
   .cell-input:focus{border-color:var(--green-border);background:var(--bg);}
   .cell-input.num{font-family:'JetBrains Mono',monospace;text-align:right;}
-  th.col-annee,td.col-annee{width:80px;}
-  th.col-club,td.col-club{min-width:180px;}
-  th.col-niveau,td.col-niveau,th.col-matchs,td.col-matchs,th.col-buts,td.col-buts,th.col-pd,td.col-pd,th.col-note,td.col-note{width:60px;}
-  th.col-potentiel,td.col-potentiel{width:90px;}
-  th.col-titre,td.col-titre{min-width:160px;}
-  th.col-objectif,td.col-objectif{width:70px;}
-  .del-cell{width:32px;text-align:center;}
-  .del-btn{background:transparent;border:none;color:var(--text-muted);font-size:16px;line-height:1;padding:2px 4px;}
+  th.col-annee,td.col-annee{width:52px;}
+  th.col-club,td.col-club{width:120px;}
+  th.col-niveau,td.col-niveau,th.col-matchs,td.col-matchs,th.col-buts,td.col-buts,th.col-pd,td.col-pd,th.col-note,td.col-note{width:38px;}
+  th.col-potentiel,td.col-potentiel{width:56px;}
+  th.col-titre,td.col-titre{width:110px;}
+  th.col-objectif,td.col-objectif{width:46px;}
+  .del-cell{width:20px;text-align:center;}
+  .del-btn{background:transparent;border:none;color:var(--text-muted);font-size:15px;line-height:1;padding:2px 2px;}
   .del-btn:hover{color:var(--red);}
   .note-cell{font-weight:700;font-family:'JetBrains Mono',monospace;}
 
   .add-row-bar{padding:8px;}
   .add-btn{background:var(--green-dark);border:1px solid var(--green-border);color:var(--green);padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;}
 
-  .career-summary{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0 18px;}
-  .summary-item{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:8px 14px;text-align:center;min-width:80px;}
-  .summary-value{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:18px;}
-  .summary-label{font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+  .career-summary{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 14px;}
+  .summary-item{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:6px 12px;text-align:center;min-width:64px;}
+  .summary-value{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;}
+  .summary-label{font-size:9px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.4px;margin-top:1px;}
 
   .install-bar{position:sticky;top:0;background:var(--green-dark);border-bottom:1px solid var(--green-border);color:var(--green);font-size:13px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:40;}
   .install-bar button{background:var(--green);border:none;color:#08130D;font-weight:600;padding:6px 12px;border-radius:6px;font-size:12px;}
