@@ -122,8 +122,13 @@
   /* GOALS PANEL */
   .goal-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
   .goal-row:last-of-type{border-bottom:none;}
+  .goal-check{appearance:none;width:18px;height:18px;border:1.5px solid var(--border);border-radius:5px;background:var(--panel2);margin-top:4px;flex-shrink:0;display:grid;place-items:center;cursor:pointer;}
+  .goal-check:checked{background:var(--green-dark);border-color:var(--green);}
+  .goal-check:checked::after{content:"✓";color:var(--green);font-size:13px;font-weight:700;line-height:1;}
   .goal-icon{width:22px;height:22px;flex-shrink:0;color:var(--gold);margin-top:2px;}
   .goal-text{flex:1;background:transparent;border:none;color:var(--text);font-size:12.5px;line-height:1.5;outline:none;resize:none;width:100%;font-family:'Inter',sans-serif;}
+  .goal-row.done .goal-icon{color:var(--green);}
+  .goal-row.done .goal-text{color:var(--text-secondary);text-decoration:line-through;text-decoration-thickness:1px;}
   .goal-del{background:transparent;border:none;color:var(--text-muted);font-size:14px;flex-shrink:0;}
   .goal-del:hover{color:var(--red);}
   .add-goal-btn{margin-top:8px;background:transparent;border:1px dashed #2C3A5A;color:var(--text-muted);padding:6px 10px;border-radius:8px;font-size:11px;width:100%;}
@@ -169,7 +174,7 @@
 /* ---------- Utils ---------- */
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const emptyYear = () => ({ id: uid(), age:"", club:"", niveau:"", potentiel:"", potentielDelta:"", matches:"", buts:"", pd:"", note:"", bonus:"", objectif:"", contrat:"" });
-const emptyGoal = (t) => ({ id: uid(), text: t || "" });
+const emptyGoal = (t) => ({ id: uid(), text: t || "", completed: false });
 const emptyPlayer = (n) => ({
   id: uid(), name: n || "Nouveau joueur",
   currentClub:"", currentLeague:"", dreamClub:"", dreamLeague:"",
@@ -605,7 +610,9 @@ function refRow(label, value, cls){
 }
 
 function goalRow(g){
-  return `<div class="goal-row" data-goal-id="${g.id}">
+  const checked = g.completed ? " checked" : "";
+  return `<div class="goal-row ${g.completed ? 'done' : ''}" data-goal-id="${g.id}">
+    <input class="goal-check" type="checkbox" data-field="goal-completed" aria-label="Objectif rempli"${checked} />
     <svg class="goal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.9 6.26L21.5 9l-5 4.7L17.8 21 12 17.4 6.2 21l1.3-7.3-5-4.7 6.6-.74L12 2z"/></svg>
     <textarea class="goal-text" data-field="goal-text" rows="2">${esc(g.text)}</textarea>
     <button class="goal-del" data-action="delete-goal" data-id="${g.id}" aria-label="Supprimer">×</button>
@@ -784,6 +791,8 @@ function attachEvents(){
     const goal = currentPlayer().goals.find(g => g.id === row.dataset.goalId);
     const ta = row.querySelector('[data-field="goal-text"]');
     if(ta) ta.addEventListener('change', () => { goal.text = ta.value; touch(); });
+    const cb = row.querySelector('[data-field="goal-completed"]');
+    if(cb) cb.addEventListener('change', () => { goal.completed = cb.checked; touch(); render(); });
   });
   root.querySelectorAll('[data-action="delete-goal"]').forEach(el => {
     el.addEventListener('click', () => {
