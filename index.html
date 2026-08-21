@@ -35,6 +35,9 @@
   .tab{background:transparent;border:1px solid var(--border);color:var(--text-secondary);padding:5px 12px;border-radius:999px;font-size:12px;white-space:nowrap;}
   .tab.active{background:var(--blue-dark);border-color:var(--blue);color:#9CC1FF;}
   .tab-add{background:transparent;border:1px dashed #2C3A5A;color:var(--text-muted);padding:5px 12px;border-radius:999px;font-size:12px;white-space:nowrap;}
+  .io-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .io-btn{background:var(--panel);border:1px solid var(--border);color:var(--text-secondary);padding:5px 12px;border-radius:8px;font-size:11px;cursor:pointer;display:inline-block;}
+  .io-btn:hover{color:var(--text);border-color:var(--blue);}
   .link-btn{background:transparent;border:none;color:var(--text-secondary);font-size:11px;text-decoration:underline;padding:0;}
 
   /* HERO BANNER */
@@ -262,8 +265,11 @@ function handleFlagError(img){
 
 
 /* ---------- State ---------- */
+const savedPlayers = loadJSON('fifaCareerPlayersV2', null);
+const migratedPlayers = savedPlayers ? null : migrateOld();
+const hasOwnData = !!(savedPlayers || migratedPlayers);
 const state = {
-  players: loadJSON('fifaCareerPlayersV2', null) || migrateOld() || [emptyPlayer("Joueur 1")],
+  players: savedPlayers || migratedPlayers || [emptyPlayer("Joueur 1")],
   playerId: null,
 };
 if(!state.players.length) state.players = [emptyPlayer("Joueur 1")];
@@ -349,6 +355,12 @@ function render(){
     <div class="tab-row">
       ${state.players.map(p => `<button class="tab ${p.id===state.playerId?'active':''}" data-action="select-player" data-id="${p.id}">${esc(p.name)}</button>`).join("")}
       <button class="tab-add" data-action="add-player">+ joueur</button>
+    </div>
+    <div class="io-row">
+      <button class="io-btn" data-action="export-data">⇩ Exporter data.json</button>
+      <button class="io-btn" data-action="load-from-repo">⟳ Charger depuis le repo</button>
+      <label class="io-btn" for="import-file-input">⇧ Importer un fichier</label>
+      <input type="file" id="import-file-input" accept="application/json" style="display:none" />
     </div>
 
     <div class="banner has-photo" id="player-banner">
@@ -546,6 +558,56 @@ function ratingColor(r){
 function attachEvents(){
   const root = document.getElementById('root');
 
+  const exportBtn = root.querySelector('[data-action="export-data"]');
+  if(exportBtn) exportBtn.addEventListener('click', () => {
+    const data = JSON.stringify(state.players, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+  const loadRepoBtn = root.querySelector('[data-action="load-from-repo"]');
+  if(loadRepoBtn) loadRepoBtn.addEventListener('click', async () => {
+    loadRepoBtn.textContent = '⟳ Chargement...';
+    try{
+      const res = await fetch('data.json', { cache: 'no-store' });
+      if(!res.ok) throw new Error('not found');
+      const parsed = await res.json();
+      if(!Array.isArray(parsed) || !parsed.length) throw new Error('empty');
+      state.players = parsed;
+      state.playerId = parsed[0].id;
+      save();
+      render();
+    } catch(err){
+      alert("Impossible de trouver data.json à la racine du site. Vérifie qu'il a bien été ajouté au repo.");
+      loadRepoBtn.textContent = '⟳ Charger depuis le repo';
+    }
+  });
+  const importInput = root.querySelector('#import-file-input');
+  if(importInput) importInput.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try{
+        const parsed = JSON.parse(ev.target.result);
+        if(!Array.isArray(parsed) || !parsed.length) throw new Error('empty');
+        state.players = parsed;
+        state.playerId = parsed[0].id;
+        save();
+        render();
+      } catch(err){
+        alert("Ce fichier ne semble pas être un export valide.");
+      }
+    };
+    reader.readAsText(file);
+  });
+
   root.querySelectorAll('[data-action="select-player"]').forEach(el => {
     el.addEventListener('click', () => { state.playerId = el.dataset.id; render(); });
   });
@@ -610,6 +672,21 @@ function attachEvents(){
 }
 
 render();
+
+/* Auto-load data.json for first-time visitors (e.g. someone you shared the link with) */
+if(!hasOwnData){
+  fetch('data.json', { cache: 'no-store' })
+    .then(res => res.ok ? res.json() : null)
+    .then(parsed => {
+      if(Array.isArray(parsed) && parsed.length){
+        state.players = parsed;
+        state.playerId = parsed[0].id;
+        save();
+        render();
+      }
+    })
+    .catch(() => {});
+}
 
 /* ---------- PWA: service worker (static file, manifest linked in <head>) ---------- */
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
