@@ -38,7 +38,7 @@
   .link-btn{background:transparent;border:none;color:var(--text-secondary);font-size:11px;text-decoration:underline;padding:0;}
 
   /* HERO BANNER */
-  .banner{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:linear-gradient(120deg,#0C1730 0%,#0E1A38 45%,#170F1C 100%);padding:22px 26px;margin-bottom:14px;display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;min-height:190px;}
+  .banner{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:linear-gradient(120deg,#0C1730 0%,#0E1A38 45%,#170F1C 100%);padding:22px 26px;margin-bottom:14px;display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;min-height:205px;}
   .banner::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg, rgba(59,130,246,0.14), transparent 40%, rgba(226,80,74,0.14));pointer-events:none;z-index:0;}
   .banner.has-photo{padding-left:110px;}
   .photo-col{position:absolute;left:14px;top:14px;width:80px;z-index:1;}
@@ -55,7 +55,7 @@
   .name-sub-text{font-size:12px;color:var(--text-secondary);}
   .mode-pill{background:var(--blue-dark);border:1px solid var(--blue);color:#9CC1FF;font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:0.5px;}
 
-  .club-track{display:flex;align-items:flex-start;gap:28px;position:relative;z-index:1;flex-wrap:nowrap;overflow-x:auto;margin-top:2px;}
+  .club-track{position:absolute;left:14px;top:108px;display:flex;align-items:flex-start;gap:28px;z-index:1;flex-wrap:nowrap;}
   .club-badge{display:flex;flex-direction:column;gap:6px;}
   .club-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;}
   .club-badge-row{display:flex;align-items:center;gap:10px;}
@@ -333,27 +333,27 @@ function render(){
           <span class="mode-pill">Mode RP</span>
           ${state.players.length>1 ? `<button class="link-btn" data-action="delete-player">Supprimer ce joueur</button>` : ""}
         </div>
-        <div class="club-track">
-          <div class="club-badge">
-            <div class="club-label" style="color:var(--blue)">Club actuel</div>
-            <div class="club-badge-row">
-              ${clubBadge(player.currentClub, "blue mini")}
-              <div>
-                <input class="club-text-input" id="current-club-input" value="${esc(player.currentClub)}" placeholder="Club actuel" />
-                <br/>
-                <input class="league-text-input" id="current-league-input" value="${esc(player.currentLeague)}" placeholder="Championnat" />
-              </div>
+      </div>
+      <div class="club-track">
+        <div class="club-badge">
+          <div class="club-label" style="color:var(--blue)">Club actuel</div>
+          <div class="club-badge-row">
+            ${clubBadge(player.currentClub, "blue mini")}
+            <div>
+              <input class="club-text-input" id="current-club-input" value="${esc(player.currentClub)}" placeholder="Club actuel" />
+              <br/>
+              <input class="league-text-input" id="current-league-input" value="${esc(player.currentLeague)}" placeholder="Championnat" />
             </div>
           </div>
-          <div class="club-badge">
-            <div class="club-label" style="color:var(--red)">Club rêvé</div>
-            <div class="club-badge-row">
-              ${clubBadge(player.dreamClub, "red mini")}
-              <div>
-                <input class="club-text-input" id="dream-club-input" value="${esc(player.dreamClub)}" placeholder="Club rêvé" />
-                <br/>
-                <input class="league-text-input" id="dream-league-input" value="${esc(player.dreamLeague)}" placeholder="Championnat" />
-              </div>
+        </div>
+        <div class="club-badge">
+          <div class="club-label" style="color:var(--red)">Club rêvé</div>
+          <div class="club-badge-row">
+            ${clubBadge(player.dreamClub, "red mini")}
+            <div>
+              <input class="club-text-input" id="dream-club-input" value="${esc(player.dreamClub)}" placeholder="Club rêvé" />
+              <br/>
+              <input class="league-text-input" id="dream-league-input" value="${esc(player.dreamLeague)}" placeholder="Championnat" />
             </div>
           </div>
         </div>
