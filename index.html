@@ -53,19 +53,18 @@
   .name-sub-text{font-size:12px;color:var(--text-secondary);}
   .mode-pill{background:var(--blue-dark);border:1px solid var(--blue);color:#9CC1FF;font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:0.5px;}
 
-  .club-track{display:flex;align-items:center;gap:14px;position:relative;z-index:1;flex-wrap:wrap;}
+  .club-track{display:flex;align-items:center;gap:24px;position:relative;z-index:1;flex-wrap:wrap;}
   .club-badge{display:flex;flex-direction:column;gap:4px;}
   .club-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;}
   .club-badge-row{display:flex;align-items:center;gap:8px;}
   .club-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Teko',sans-serif;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;position:relative;overflow:hidden;}
   .club-circle.blue{background:var(--blue-dark);border:1.5px solid var(--blue);color:#9CC1FF;}
   .club-circle.red{background:var(--red-dark);border:1.5px solid var(--red);color:#F0908B;}
-  .club-circle.logo-circle{background:#fff;padding:3px;}
-  .club-circle.logo-circle img{width:100%;height:100%;object-fit:contain;border-radius:50%;}
+  .club-circle.logo-circle{background:transparent;border-color:transparent;}
+  .club-circle.logo-circle img{width:100%;height:100%;object-fit:contain;}
   .club-circle-fallback{display:none;width:100%;height:100%;position:absolute;inset:0;align-items:center;justify-content:center;}
   .club-text-input{background:transparent;border:none;color:var(--text);font-size:13px;font-weight:500;outline:none;width:120px;}
   .league-text-input{background:transparent;border:none;color:var(--text-secondary);font-size:10px;outline:none;width:120px;text-transform:uppercase;letter-spacing:0.3px;}
-  .club-arrow{color:var(--text-muted);font-size:16px;align-self:center;margin-top:14px;}
 
   /* MAIN GRID */
   .main-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;align-items:start;}
@@ -343,7 +342,6 @@ function render(){
             </div>
           </div>
         </div>
-        <span class="club-arrow">→</span>
         <div class="club-badge">
           <div class="club-label" style="color:var(--red)">Club rêvé</div>
           <div class="club-badge-row">
