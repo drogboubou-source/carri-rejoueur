@@ -44,31 +44,34 @@
   .link-btn{background:transparent;border:none;color:var(--text-secondary);font-size:11px;text-decoration:underline;padding:0;}
 
   /* HERO BANNER */
-  .banner{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:linear-gradient(120deg,#0C1730 0%,#0E1A38 45%,#170F1C 100%);padding:22px 26px;margin-bottom:14px;display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;min-height:232px;}
+  .banner{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:linear-gradient(120deg,#0C1730 0%,#0E1A38 45%,#170F1C 100%);padding:20px 24px;margin-bottom:14px;display:flex;flex-direction:column;gap:16px;}
   .banner::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg, rgba(59,130,246,0.14), transparent 40%, rgba(226,80,74,0.14));pointer-events:none;z-index:0;}
-  .banner.has-photo{padding-left:112px;}
-  .photo-col{position:absolute;left:16px;top:14px;width:80px;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;}
-  .photo-bleed{position:relative;width:80px;height:80px;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1.5px var(--border);}
+
+  .banner-top{display:flex;align-items:center;gap:18px;position:relative;z-index:1;flex-wrap:wrap;}
+  .photo-wrap{position:relative;width:84px;height:84px;flex-shrink:0;}
+  .photo-bleed{width:84px;height:84px;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1.5px var(--border);}
   .photo-bleed img{width:100%;height:100%;object-fit:cover;object-position:top center;filter:saturate(1.05) contrast(1.03);}
-  .avatar.avatar-fallback{position:relative;top:auto;left:auto;width:80px;height:80px;border-radius:12px;}
-  .avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--red));display:flex;align-items:center;justify-content:center;font-family:'Teko',sans-serif;font-size:26px;font-weight:600;color:#fff;flex-shrink:0;position:relative;z-index:1;}
-  .name-row{display:flex;align-items:center;gap:10px;}
-  .name-flag{width:30px;height:auto;border-radius:3px;box-shadow:0 0 0 1px var(--border);flex-shrink:0;}
-  .banner-mid{flex:1;min-width:200px;position:relative;z-index:1;margin-top:52px;display:flex;flex-direction:column;align-items:flex-start;}
-  .photo-field{margin-top:8px;display:flex;align-items:center;flex-wrap:wrap;}
-  .photo-upload-btn{background:var(--blue-dark);border:1px solid var(--blue);color:#9CC1FF;font-size:11px;font-weight:500;padding:6px 12px;border-radius:8px;cursor:pointer;display:inline-block;}
-  .photo-upload-btn:hover{background:#173a68;}
-  .player-name{font-family:'Teko',sans-serif;font-weight:700;font-size:clamp(28px,5vw,44px);line-height:1;background:linear-gradient(90deg,#EAF0FB 0%,#9CC1FF 45%,#F0908B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:0.5px;border:none;outline:none;width:100%;min-width:0;padding:0;}
-  .name-sub{display:flex;align-items:center;gap:8px;margin:8px 0 0;flex-wrap:wrap;}
+  .avatar.avatar-fallback{width:84px;height:84px;border-radius:14px;}
+  .avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--red));display:flex;align-items:center;justify-content:center;font-family:'Teko',sans-serif;font-size:26px;font-weight:600;color:#fff;flex-shrink:0;}
+  .flag-badge{position:absolute;right:-6px;bottom:-6px;width:30px;height:22px;border-radius:5px;overflow:hidden;box-shadow:0 0 0 2px #0B1220, 0 0 0 3px var(--border);z-index:2;}
+  .flag-badge img{width:100%;height:100%;object-fit:cover;display:block;}
+
+  .banner-name-block{flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px;}
+  .name-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .player-name{font-family:'Teko',sans-serif;font-weight:700;font-size:clamp(26px,5vw,40px);line-height:1;background:linear-gradient(90deg,#EAF0FB 0%,#9CC1FF 45%,#F0908B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:0.5px;border:none;outline:none;flex:1;min-width:120px;padding:0;}
+  .mode-pill{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;min-height:24px;background:linear-gradient(180deg,#173A68,#122A4E);border:1px solid var(--blue);box-shadow:0 0 0 1px rgba(59,130,246,0.12),0 6px 14px rgba(0,0,0,0.18);color:#B8D4FF;font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;}
+  .name-sub{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .name-sub-text{font-size:12px;color:var(--text-secondary);}
   .youtube-note{display:inline-flex;align-items:center;gap:7px;color:var(--text-secondary);font-size:12px;line-height:1;text-decoration:none;}
   .youtube-note:hover{color:var(--text);}
   .youtube-logo{width:22px;height:auto;display:block;flex-shrink:0;}
   .card-head .youtube-note{font-size:11px;margin-left:4px;}
   .card-head .youtube-logo{width:20px;}
-  .mode-pill{position:absolute;right:18px;top:14px;z-index:2;display:inline-flex;align-items:center;justify-content:center;min-height:24px;background:linear-gradient(180deg,#173A68,#122A4E);border:1px solid var(--blue);box-shadow:0 0 0 1px rgba(59,130,246,0.12),0 6px 14px rgba(0,0,0,0.18);color:#B8D4FF;font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;flex-shrink:0;}
+  .photo-field{margin-top:8px;display:flex;align-items:center;flex-wrap:wrap;}
+  .photo-upload-btn{background:var(--blue-dark);border:1px solid var(--blue);color:#9CC1FF;font-size:11px;font-weight:500;padding:6px 12px;border-radius:8px;cursor:pointer;display:inline-block;}
+  .photo-upload-btn:hover{background:#173a68;}
 
-  .club-track{position:absolute;left:14px;top:142px;display:flex;align-items:flex-start;gap:28px;z-index:1;flex-wrap:nowrap;}
+  .club-track{display:flex;align-items:flex-start;gap:28px;position:relative;z-index:1;flex-wrap:wrap;padding-top:2px;border-top:1px solid rgba(255,255,255,0.06);}
   .club-badge{display:flex;flex-direction:column;gap:6px;}
   .club-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;}
   .club-badge-row{display:flex;align-items:center;gap:10px;}
@@ -467,19 +470,26 @@ function render(){
     </div>
 
     <div class="banner has-photo" id="player-banner">
-      <div class="photo-col">
-        <img class="name-flag" data-base="images/flag-${playerIndex+1}" data-ext-idx="0" src="images/flag-${playerIndex+1}.png" alt="Drapeau" onerror="handleFlagError(this)" />
-        <div class="photo-bleed">
-          <img id="player-photo-img" data-base="images/joueur-${playerIndex+1}" data-ext-idx="0" src="images/joueur-${playerIndex+1}.png" alt="Photo de ${esc(player.name)}" onerror="handlePhotoError(this)" />
+      <div class="banner-top">
+        <div class="photo-wrap">
+          <div class="photo-bleed">
+            <img id="player-photo-img" data-base="images/joueur-${playerIndex+1}" data-ext-idx="0" src="images/joueur-${playerIndex+1}.png" alt="Photo de ${esc(player.name)}" onerror="handlePhotoError(this)" />
+          </div>
+          <div class="avatar avatar-fallback" style="display:none">${esc(initials(player.name))}</div>
+          <div class="flag-badge">
+            <img data-base="images/flag-${playerIndex+1}" data-ext-idx="0" src="images/flag-${playerIndex+1}.png" alt="Drapeau" onerror="handleFlagError(this)" />
+          </div>
         </div>
-        <div class="avatar avatar-fallback" style="display:none">${esc(initials(player.name))}</div>
-      </div>
-      <div class="banner-mid">
-        <div class="name-row">
-          <input class="player-name" id="player-name-input" value="${esc(player.name)}" />
+        <div class="banner-name-block">
+          <div class="name-row">
+            <input class="player-name" id="player-name-input" value="${esc(player.name)}" />
+            <span class="mode-pill">Mode RP</span>
+          </div>
+          <div class="name-sub">
+            <span class="name-sub-text">Plan de carrière du joueur</span>
+            ${state.players.length>1 ? `<button class="link-btn" data-action="delete-player">Supprimer ce joueur</button>` : ""}
+          </div>
         </div>
-        <span class="mode-pill">Mode RP</span>
-        ${state.players.length>1 ? `<div class="name-sub"><button class="link-btn" data-action="delete-player">Supprimer ce joueur</button></div>` : ""}
       </div>
       <div class="club-track">
         <div class="club-badge">
