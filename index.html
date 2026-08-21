@@ -356,12 +356,6 @@ function render(){
       ${state.players.map(p => `<button class="tab ${p.id===state.playerId?'active':''}" data-action="select-player" data-id="${p.id}">${esc(p.name)}</button>`).join("")}
       <button class="tab-add" data-action="add-player">+ joueur</button>
     </div>
-    <div class="io-row">
-      <button class="io-btn" data-action="export-data">⇩ Exporter data.json</button>
-      <button class="io-btn" data-action="load-from-repo">⟳ Charger depuis le repo</button>
-      <label class="io-btn" for="import-file-input">⇧ Importer un fichier</label>
-      <input type="file" id="import-file-input" accept="application/json" style="display:none" />
-    </div>
 
     <div class="banner has-photo" id="player-banner">
       <div class="photo-col">
@@ -496,6 +490,13 @@ function render(){
     </div>
 
     <div class="footer-tag">★ Un rêve, un ballon, une légende à écrire ★</div>
+
+    <div class="io-row" style="justify-content:center;margin-top:18px;">
+      <button class="io-btn" data-action="export-data">⇩ Exporter data.json</button>
+      <button class="io-btn" data-action="load-from-repo">⟳ Charger depuis le repo</button>
+      <label class="io-btn" for="import-file-input">⇧ Importer un fichier</label>
+      <input type="file" id="import-file-input" accept="application/json" style="display:none" />
+    </div>
   `;
 
   attachEvents();
