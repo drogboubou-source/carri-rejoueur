@@ -38,11 +38,17 @@
   .link-btn{background:transparent;border:none;color:var(--text-secondary);font-size:11px;text-decoration:underline;padding:0;}
 
   /* HERO BANNER */
-  .banner{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:linear-gradient(120deg,#0C1730 0%,#0E1A38 45%,#170F1C 100%);padding:18px 20px;margin-bottom:14px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;min-height:118px;}
+  .banner{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:linear-gradient(120deg,#0C1730 0%,#0E1A38 45%,#170F1C 100%);padding:18px 20px;margin-bottom:14px;display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;min-height:190px;}
   .banner::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg, rgba(59,130,246,0.14), transparent 40%, rgba(226,80,74,0.14));pointer-events:none;z-index:0;}
   .banner.has-photo{padding-left:120px;}
-  .photo-bleed{position:absolute;left:14px;top:14px;width:90px;height:90px;border-radius:12px;overflow:hidden;z-index:1;box-shadow:0 0 0 1.5px var(--border);}
+  .photo-col{position:absolute;left:14px;top:14px;width:90px;z-index:1;display:flex;flex-direction:column;align-items:center;}
+  .photo-bleed{position:relative;width:90px;height:90px;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1.5px var(--border);flex-shrink:0;}
   .photo-bleed img{width:100%;height:100%;object-fit:cover;object-position:top center;filter:saturate(1.05) contrast(1.03);}
+  .avatar.avatar-fallback{position:absolute;top:0;left:0;width:90px;height:90px;border-radius:12px;}
+  .current-club-mini{margin-top:8px;text-align:center;width:90px;}
+  .club-label-mini{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+  .club-mini-input{display:block;background:transparent;border:none;color:var(--text);font-size:11px;font-weight:500;text-align:center;outline:none;width:90px;margin-top:3px;}
+  .league-mini-input{display:block;background:transparent;border:none;color:var(--text-secondary);font-size:9px;text-align:center;outline:none;width:90px;text-transform:uppercase;letter-spacing:0.3px;}
   .avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--red));display:flex;align-items:center;justify-content:center;font-family:'Teko',sans-serif;font-size:26px;font-weight:600;color:#fff;flex-shrink:0;position:relative;z-index:1;}
   .banner-mid{flex:1;min-width:200px;position:relative;z-index:1;}
   .photo-field{margin-top:8px;display:flex;align-items:center;flex-wrap:wrap;}
@@ -58,6 +64,7 @@
   .club-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;}
   .club-badge-row{display:flex;align-items:center;gap:8px;}
   .club-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Teko',sans-serif;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;position:relative;overflow:hidden;}
+  .club-circle.mini{width:26px;height:26px;font-size:11px;margin:0 auto;}
   .club-circle.blue{background:var(--blue-dark);border:1.5px solid var(--blue);color:#9CC1FF;}
   .club-circle.red{background:var(--red-dark);border:1.5px solid var(--red);color:#F0908B;}
   .club-circle.logo-circle{background:transparent;border-color:transparent;}
@@ -318,10 +325,18 @@ function render(){
     </div>
 
     <div class="banner has-photo" id="player-banner">
-      <div class="photo-bleed">
-        <img id="player-photo-img" data-base="images/joueur-${playerIndex+1}" data-ext-idx="0" src="images/joueur-${playerIndex+1}.png" alt="Photo de ${esc(player.name)}" onerror="handlePhotoError(this)" />
+      <div class="photo-col">
+        <div class="photo-bleed">
+          <img id="player-photo-img" data-base="images/joueur-${playerIndex+1}" data-ext-idx="0" src="images/joueur-${playerIndex+1}.png" alt="Photo de ${esc(player.name)}" onerror="handlePhotoError(this)" />
+        </div>
+        <div class="avatar avatar-fallback" style="display:none">${esc(initials(player.name))}</div>
+        <div class="current-club-mini">
+          <div class="club-label-mini" style="color:var(--blue)">Actuel</div>
+          ${clubBadge(player.currentClub, "blue mini")}
+          <input class="club-mini-input" id="current-club-input" value="${esc(player.currentClub)}" placeholder="Club actuel" />
+          <input class="league-mini-input" id="current-league-input" value="${esc(player.currentLeague)}" placeholder="Championnat" />
+        </div>
       </div>
-      <div class="avatar avatar-fallback" style="display:none">${esc(initials(player.name))}</div>
       <div class="banner-mid">
         <input class="player-name" id="player-name-input" value="${esc(player.name)}" />
         <div class="name-sub">
@@ -329,27 +344,16 @@ function render(){
           <span class="mode-pill">Mode RP</span>
           ${state.players.length>1 ? `<button class="link-btn" data-action="delete-player">Supprimer ce joueur</button>` : ""}
         </div>
-      </div>
-      <div class="club-track">
-        <div class="club-badge">
-          <div class="club-label" style="color:var(--blue)">Club actuel</div>
-          <div class="club-badge-row">
-            ${clubBadge(player.currentClub, "blue")}
-            <div>
-              <input class="club-text-input" id="current-club-input" value="${esc(player.currentClub)}" placeholder="Club actuel" />
-              <br/>
-              <input class="league-text-input" id="current-league-input" value="${esc(player.currentLeague)}" placeholder="Championnat" />
-            </div>
-          </div>
-        </div>
-        <div class="club-badge">
-          <div class="club-label" style="color:var(--red)">Club rêvé</div>
-          <div class="club-badge-row">
-            ${clubBadge(player.dreamClub, "red")}
-            <div>
-              <input class="club-text-input" id="dream-club-input" value="${esc(player.dreamClub)}" placeholder="Club rêvé" />
-              <br/>
-              <input class="league-text-input" id="dream-league-input" value="${esc(player.dreamLeague)}" placeholder="Championnat" />
+        <div class="club-track">
+          <div class="club-badge">
+            <div class="club-label" style="color:var(--red)">Club rêvé</div>
+            <div class="club-badge-row">
+              ${clubBadge(player.dreamClub, "red")}
+              <div>
+                <input class="club-text-input" id="dream-club-input" value="${esc(player.dreamClub)}" placeholder="Club rêvé" />
+                <br/>
+                <input class="league-text-input" id="dream-league-input" value="${esc(player.dreamLeague)}" placeholder="Championnat" />
+              </div>
             </div>
           </div>
         </div>
