@@ -489,11 +489,11 @@ function render(){
       </div>
       <div class="ref-col">
         ${refCard("var(--pink)", "Contrat &amp; transfert", TRANSFER_RULES.map(r => `<div class="ref-row" style="align-items:flex-start"><span class="ref-label" style="min-width:100px">${esc(r[0])}</span><span class="ref-value" style="font-size:11px">${esc(r[1])}</span></div>`).join(""))}
-        ${refCard("var(--green)", "Objectifs", OBJECTIFS_RULES.map(r => refRow(r[0], r[1], r[2])).join(""))}
+        ${refCard("var(--green)", "Objectifs contrat/transfert", OBJECTIFS_RULES.map(r => refRow(r[0], r[1], r[2])).join(""))}
       </div>
     </div>
 
-    <div class="footer-tag">★ Des rêves, des efforts, des résultats ! ★</div>
+    <div class="footer-tag">★ Un rêve, un ballon, une légende à écrire ★</div>
   `;
 
   attachEvents();
