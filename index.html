@@ -41,6 +41,7 @@
   .sync-status{width:100%;text-align:center;color:var(--text-muted);font-size:10px;margin-top:-8px;}
   .sync-status.ok{color:var(--green);}
   .sync-status.err{color:var(--red);}
+  .readonly-note{width:100%;text-align:center;color:var(--text-secondary);font-size:11px;}
   .link-btn{background:transparent;border:none;color:var(--text-secondary);font-size:11px;text-decoration:underline;padding:0;}
 
   /* HERO BANNER */
@@ -96,6 +97,8 @@
   .cell-input{width:100%;background:transparent;border:1px solid transparent;border-radius:6px;color:var(--text);padding:7px 7px;font-size:12px;outline:none;text-align:center;}
   .cell-input:hover{border-color:var(--input-border);}
   .cell-input:focus{border-color:var(--blue);background:var(--bg);}
+  .cell-input[readonly], .goal-text[readonly], .player-name[readonly], .club-text-input[readonly], .league-text-input[readonly]{cursor:default;border-color:transparent;pointer-events:none;}
+  .cell-input[readonly]:focus, .goal-text[readonly]:focus{background:transparent;border-color:transparent;}
   .cell-input.mono{font-family:'JetBrains Mono',monospace;}
   .pot-pair{display:flex;gap:4px;}
   .pot-pair input:first-child{flex:1.3;}
@@ -192,6 +195,12 @@ function touch(){
 /* ---------- Shared-link publishing ---------- */
 const SYNC_CONFIG = window.CARRIERE_SYNC || {};
 const GITHUB_TOKEN_KEY = 'fifaCareerGithubToken';
+const EDIT_MODE_KEY = 'fifaCareerEditMode';
+const urlParams = new URLSearchParams(window.location.search);
+if(urlParams.get('edit') === '1') localStorage.setItem(EDIT_MODE_KEY, '1');
+if(urlParams.get('view') === '1') localStorage.removeItem(EDIT_MODE_KEY);
+const canEdit = localStorage.getItem(EDIT_MODE_KEY) === '1';
+const readOnlyAttr = () => canEdit ? "" : " readonly";
 
 function syncRepoReady(){
   return SYNC_CONFIG.provider === 'github' && SYNC_CONFIG.owner && SYNC_CONFIG.repo && SYNC_CONFIG.path;
@@ -436,7 +445,7 @@ function render(){
   root.innerHTML = `
     <div class="tab-row">
       ${state.players.map(p => `<button class="tab ${p.id===state.playerId?'active':''}" data-action="select-player" data-id="${p.id}">${esc(p.name)}</button>`).join("")}
-      <button class="tab-add" data-action="add-player">+ joueur</button>
+      ${canEdit ? `<button class="tab-add" data-action="add-player">+ joueur</button>` : ""}
     </div>
 
     <div class="banner has-photo" id="player-banner">
@@ -448,13 +457,13 @@ function render(){
       </div>
       <div class="banner-mid">
         <div class="name-row">
-          <input class="player-name" id="player-name-input" value="${esc(player.name)}" />
+          <input class="player-name" id="player-name-input" value="${esc(player.name)}"${readOnlyAttr()} />
           <img class="name-flag" data-base="images/flag-${playerIndex+1}" data-ext-idx="0" src="images/flag-${playerIndex+1}.png" alt="Drapeau" onerror="handleFlagError(this)" />
         </div>
         <div class="name-sub">
           <span class="name-sub-text">Plan de carrière du joueur</span>
-          <span class="mode-pill">Mode RP</span>
-          ${state.players.length>1 ? `<button class="link-btn" data-action="delete-player">Supprimer ce joueur</button>` : ""}
+          <span class="mode-pill">${canEdit ? "Mode edition" : "Lecture seule"}</span>
+          ${canEdit && state.players.length>1 ? `<button class="link-btn" data-action="delete-player">Supprimer ce joueur</button>` : ""}
         </div>
       </div>
       <div class="club-track">
@@ -463,9 +472,9 @@ function render(){
           <div class="club-badge-row">
             ${clubBadge(player.currentClub, "blue mini")}
             <div>
-              <input class="club-text-input" id="current-club-input" value="${esc(player.currentClub)}" placeholder="Club actuel" />
+              <input class="club-text-input" id="current-club-input" value="${esc(player.currentClub)}" placeholder="Club actuel"${readOnlyAttr()} />
               <br/>
-              <input class="league-text-input" id="current-league-input" value="${esc(player.currentLeague)}" placeholder="Championnat" />
+              <input class="league-text-input" id="current-league-input" value="${esc(player.currentLeague)}" placeholder="Championnat"${readOnlyAttr()} />
             </div>
           </div>
         </div>
@@ -474,9 +483,9 @@ function render(){
           <div class="club-badge-row">
             ${clubBadge(player.dreamClub, "red mini")}
             <div>
-              <input class="club-text-input" id="dream-club-input" value="${esc(player.dreamClub)}" placeholder="Club rêvé" />
+              <input class="club-text-input" id="dream-club-input" value="${esc(player.dreamClub)}" placeholder="Club rêvé"${readOnlyAttr()} />
               <br/>
-              <input class="league-text-input" id="dream-league-input" value="${esc(player.dreamLeague)}" placeholder="Championnat" />
+              <input class="league-text-input" id="dream-league-input" value="${esc(player.dreamLeague)}" placeholder="Championnat"${readOnlyAttr()} />
             </div>
           </div>
         </div>
@@ -527,7 +536,7 @@ function render(){
               </tfoot>
             </table>
           </div>
-          <div class="add-row-bar"><button class="add-btn" data-action="add-year">+ Ajouter une année</button></div>
+          ${canEdit ? `<div class="add-row-bar"><button class="add-btn" data-action="add-year">+ Ajouter une année</button></div>` : ""}
         </div>
       </div>
 
@@ -535,7 +544,7 @@ function render(){
         <div class="card-head"><span class="dot" style="background:var(--gold)"></span><span class="card-title">Rêves &amp; objectifs ultimes</span></div>
         <div class="card-body">
           ${player.goals.map(goalRow).join("")}
-          <button class="add-goal-btn" data-action="add-goal">+ Ajouter un rêve</button>
+          ${canEdit ? `<button class="add-goal-btn" data-action="add-goal">+ Ajouter un rêve</button>` : ""}
         </div>
       </div>
     </div>
@@ -573,15 +582,16 @@ function render(){
 
     <div class="footer-tag">★ Un rêve, un ballon, une légende à écrire ★</div>
 
-    <div class="io-row" style="justify-content:center;margin-top:18px;">
+    ${canEdit ? `<div class="io-row" style="justify-content:center;margin-top:18px;">
       <button class="io-btn" data-action="publish-shared">Publier sur le lien partage</button>
       <button class="io-btn" data-action="export-data">⇩ Exporter data.json</button>
       <button class="io-btn" data-action="load-from-repo">⟳ Charger depuis le repo</button>
       <label class="io-btn" for="import-file-input">⇧ Importer un fichier</label>
       <button class="io-btn" data-action="forget-token">Oublier le token</button>
+      <button class="io-btn" data-action="leave-edit">Quitter le mode edition</button>
       <input type="file" id="import-file-input" accept="application/json" style="display:none" />
       <div id="sync-status" class="sync-status">${esc(syncStatusText())}</div>
-    </div>
+    </div>` : `<div class="io-row" style="justify-content:center;margin-top:18px;"><div class="readonly-note">Mode lecture seule : les visiteurs peuvent consulter, pas modifier.</div></div>`}
   `;
 
   attachEvents();
@@ -607,28 +617,28 @@ function refRow(label, value, cls){
 function goalRow(g){
   return `<div class="goal-row" data-goal-id="${g.id}">
     <svg class="goal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.9 6.26L21.5 9l-5 4.7L17.8 21 12 17.4 6.2 21l1.3-7.3-5-4.7 6.6-.74L12 2z"/></svg>
-    <textarea class="goal-text" data-field="goal-text" rows="2">${esc(g.text)}</textarea>
-    <button class="goal-del" data-action="delete-goal" data-id="${g.id}" aria-label="Supprimer">×</button>
+    <textarea class="goal-text" data-field="goal-text" rows="2"${readOnlyAttr()}>${esc(g.text)}</textarea>
+    ${canEdit ? `<button class="goal-del" data-action="delete-goal" data-id="${g.id}" aria-label="Supprimer">×</button>` : ""}
   </div>`;
 }
 
 function yearRow(y){
   return `<tr data-year-id="${y.id}">
-    <td class="col-age"><input class="cell-input" data-field="age" value="${esc(y.age)}" placeholder="16" /></td>
-    <td class="col-club"><input class="cell-input" data-field="club" value="${esc(y.club)}" placeholder="Club (pays)" /></td>
-    <td class="col-niveau"><input class="cell-input mono" data-field="niveau" value="${esc(y.niveau)}" placeholder="-" /></td>
+    <td class="col-age"><input class="cell-input" data-field="age" value="${esc(y.age)}" placeholder="16"${readOnlyAttr()} /></td>
+    <td class="col-club"><input class="cell-input" data-field="club" value="${esc(y.club)}" placeholder="Club (pays)"${readOnlyAttr()} /></td>
+    <td class="col-niveau"><input class="cell-input mono" data-field="niveau" value="${esc(y.niveau)}" placeholder="-"${readOnlyAttr()} /></td>
     <td class="col-pot"><div class="pot-pair">
-      <input class="cell-input mono" data-field="potentiel" value="${esc(y.potentiel)}" placeholder="-" />
-      <input class="cell-input mono" data-field="potentielDelta" value="${esc(y.potentielDelta)}" placeholder="+0" />
+      <input class="cell-input mono" data-field="potentiel" value="${esc(y.potentiel)}" placeholder="-"${readOnlyAttr()} />
+      <input class="cell-input mono" data-field="potentielDelta" value="${esc(y.potentielDelta)}" placeholder="+0"${readOnlyAttr()} />
     </div></td>
-    <td class="col-matchs"><input class="cell-input mono" type="number" min="0" data-field="matches" value="${esc(y.matches)}" placeholder="0" /></td>
-    <td class="col-buts"><input class="cell-input mono" type="number" min="0" data-field="buts" value="${esc(y.buts)}" placeholder="0" /></td>
-    <td class="col-pd"><input class="cell-input mono" type="number" min="0" data-field="pd" value="${esc(y.pd)}" placeholder="0" /></td>
-    <td class="col-note note-cell" style="color:${ratingColor(num(y.note))}"><input class="cell-input mono" type="number" min="0" max="10" step="0.1" data-field="note" value="${esc(y.note)}" placeholder="0" /></td>
-    <td class="col-bonus"><input class="cell-input" style="text-align:left" data-field="bonus" value="${esc(y.bonus)}" placeholder="Champion D4, Promu..." /></td>
-    <td class="col-obj"><input class="cell-input" data-field="objectif" value="${esc(y.objectif)}" placeholder="0/4" /></td>
-    <td class="col-contrat"><input class="cell-input" data-field="contrat" value="${esc(y.contrat)}" placeholder="-" /></td>
-    <td class="del-cell"><button class="del-btn" data-action="delete-year" data-id="${y.id}" aria-label="Supprimer l'année">×</button></td>
+    <td class="col-matchs"><input class="cell-input mono" type="number" min="0" data-field="matches" value="${esc(y.matches)}" placeholder="0"${readOnlyAttr()} /></td>
+    <td class="col-buts"><input class="cell-input mono" type="number" min="0" data-field="buts" value="${esc(y.buts)}" placeholder="0"${readOnlyAttr()} /></td>
+    <td class="col-pd"><input class="cell-input mono" type="number" min="0" data-field="pd" value="${esc(y.pd)}" placeholder="0"${readOnlyAttr()} /></td>
+    <td class="col-note note-cell" style="color:${ratingColor(num(y.note))}"><input class="cell-input mono" type="number" min="0" max="10" step="0.1" data-field="note" value="${esc(y.note)}" placeholder="0"${readOnlyAttr()} /></td>
+    <td class="col-bonus"><input class="cell-input" style="text-align:left" data-field="bonus" value="${esc(y.bonus)}" placeholder="Champion D4, Promu..."${readOnlyAttr()} /></td>
+    <td class="col-obj"><input class="cell-input" data-field="objectif" value="${esc(y.objectif)}" placeholder="0/4"${readOnlyAttr()} /></td>
+    <td class="col-contrat"><input class="cell-input" data-field="contrat" value="${esc(y.contrat)}" placeholder="-"${readOnlyAttr()} /></td>
+    <td class="del-cell">${canEdit ? `<button class="del-btn" data-action="delete-year" data-id="${y.id}" aria-label="Supprimer l'année">×</button>` : ""}</td>
   </tr>`;
 }
 
@@ -643,6 +653,13 @@ function ratingColor(r){
 /* ---------- Events ---------- */
 function attachEvents(){
   const root = document.getElementById('root');
+
+  if(!canEdit){
+    root.querySelectorAll('[data-action="select-player"]').forEach(el => {
+      el.addEventListener('click', () => { state.playerId = el.dataset.id; render(); });
+    });
+    return;
+  }
 
   const exportBtn = root.querySelector('[data-action="export-data"]');
   if(exportBtn) exportBtn.addEventListener('click', () => {
@@ -689,6 +706,11 @@ function attachEvents(){
       syncStatus.textContent = "Token oublie sur cet appareil.";
       syncStatus.className = 'sync-status ok';
     }
+  });
+  const leaveEditBtn = root.querySelector('[data-action="leave-edit"]');
+  if(leaveEditBtn) leaveEditBtn.addEventListener('click', () => {
+    localStorage.removeItem(EDIT_MODE_KEY);
+    location.href = location.pathname + '?view=1';
   });
   const loadRepoBtn = root.querySelector('[data-action="load-from-repo"]');
   if(loadRepoBtn) loadRepoBtn.addEventListener('click', async () => {

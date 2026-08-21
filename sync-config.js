@@ -8,8 +8,8 @@
 // le navigateur de ton appareil, en localStorage.
 window.CARRIERE_SYNC = {
   provider: "github",
-  owner: "drogboubou-source",
-  repo: "carri-rejoueur",
+  owner: "",
+  repo: "",
   branch: "main",
   path: "data.json"
 };
