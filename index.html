@@ -177,7 +177,13 @@ function loadJSON(key, fallback){
   try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
   catch(e){ return fallback; }
 }
-function save(){ localStorage.setItem('fifaCareerPlayersV2', JSON.stringify(state.players)); }
+function save(){
+  localStorage.setItem('fifaCareerDataV3', JSON.stringify({ updatedAt: state.updatedAt, players: state.players }));
+}
+function touch(){
+  state.updatedAt = new Date().toISOString();
+  save();
+}
 
 function migrateOld(){
   const old = loadJSON('fifaCareerPlayers', null);
@@ -265,11 +271,16 @@ function handleFlagError(img){
 
 
 /* ---------- State ---------- */
-const savedPlayers = loadJSON('fifaCareerPlayersV2', null);
-const migratedPlayers = savedPlayers ? null : migrateOld();
-const hasOwnData = !!(savedPlayers || migratedPlayers);
+const savedV3 = loadJSON('fifaCareerDataV3', null);
+const savedPlayersV2 = savedV3 ? null : loadJSON('fifaCareerPlayersV2', null);
+const migratedPlayers = (savedV3 || savedPlayersV2) ? null : migrateOld();
+const hasOwnData = !!(savedV3 || savedPlayersV2 || migratedPlayers);
+
 const state = {
-  players: savedPlayers || migratedPlayers || [emptyPlayer("Joueur 1")],
+  players: (savedV3 && savedV3.players) || savedPlayersV2 || migratedPlayers || [emptyPlayer("Joueur 1")],
+  // Existing local data (from before timestamps existed) is treated as "current" so it can't be
+  // silently overwritten by an older data.json on the first load after this update.
+  updatedAt: (savedV3 && savedV3.updatedAt) || (hasOwnData ? new Date().toISOString() : null),
   playerId: null,
 };
 if(!state.players.length) state.players = [emptyPlayer("Joueur 1")];
@@ -561,7 +572,9 @@ function attachEvents(){
 
   const exportBtn = root.querySelector('[data-action="export-data"]');
   if(exportBtn) exportBtn.addEventListener('click', () => {
-    const data = JSON.stringify(state.players, null, 2);
+    touch(); // stamp "now" as the export moment, so viewers can tell this is newer
+    const payload = { updatedAt: state.updatedAt, players: state.players };
+    const data = JSON.stringify(payload, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -579,9 +592,11 @@ function attachEvents(){
       const res = await fetch('data.json', { cache: 'no-store' });
       if(!res.ok) throw new Error('not found');
       const parsed = await res.json();
-      if(!Array.isArray(parsed) || !parsed.length) throw new Error('empty');
-      state.players = parsed;
-      state.playerId = parsed[0].id;
+      const players = Array.isArray(parsed) ? parsed : parsed.players;
+      if(!Array.isArray(players) || !players.length) throw new Error('empty');
+      state.players = players;
+      state.updatedAt = Array.isArray(parsed) ? new Date().toISOString() : (parsed.updatedAt || new Date().toISOString());
+      state.playerId = players[0].id;
       save();
       render();
     } catch(err){
@@ -597,9 +612,11 @@ function attachEvents(){
     reader.onload = (ev) => {
       try{
         const parsed = JSON.parse(ev.target.result);
-        if(!Array.isArray(parsed) || !parsed.length) throw new Error('empty');
-        state.players = parsed;
-        state.playerId = parsed[0].id;
+        const players = Array.isArray(parsed) ? parsed : parsed.players;
+        if(!Array.isArray(players) || !players.length) throw new Error('empty');
+        state.players = players;
+        state.updatedAt = Array.isArray(parsed) ? new Date().toISOString() : (parsed.updatedAt || new Date().toISOString());
+        state.playerId = players[0].id;
         save();
         render();
       } catch(err){
@@ -615,35 +632,35 @@ function attachEvents(){
   const addPlayerBtn = root.querySelector('[data-action="add-player"]');
   if(addPlayerBtn) addPlayerBtn.addEventListener('click', () => {
     const p = emptyPlayer(`Joueur ${state.players.length+1}`);
-    state.players.push(p); state.playerId = p.id; save(); render();
+    state.players.push(p); state.playerId = p.id; touch(); render();
   });
   const delPlayerBtn = root.querySelector('[data-action="delete-player"]');
   if(delPlayerBtn) delPlayerBtn.addEventListener('click', () => {
     if(state.players.length<=1) return;
     state.players = state.players.filter(p => p.id !== state.playerId);
-    state.playerId = state.players[0].id; save(); render();
+    state.playerId = state.players[0].id; touch(); render();
   });
 
   const nameInput = root.querySelector('#player-name-input');
-  if(nameInput) nameInput.addEventListener('change', () => { currentPlayer().name = nameInput.value || currentPlayer().name; save(); render(); });
+  if(nameInput) nameInput.addEventListener('change', () => { currentPlayer().name = nameInput.value || currentPlayer().name; touch(); render(); });
   const ccInput = root.querySelector('#current-club-input');
-  if(ccInput) ccInput.addEventListener('change', () => { currentPlayer().currentClub = ccInput.value; save(); render(); });
+  if(ccInput) ccInput.addEventListener('change', () => { currentPlayer().currentClub = ccInput.value; touch(); render(); });
   const clInput = root.querySelector('#current-league-input');
-  if(clInput) clInput.addEventListener('change', () => { currentPlayer().currentLeague = clInput.value; save(); });
+  if(clInput) clInput.addEventListener('change', () => { currentPlayer().currentLeague = clInput.value; touch(); });
   const dcInput = root.querySelector('#dream-club-input');
-  if(dcInput) dcInput.addEventListener('change', () => { currentPlayer().dreamClub = dcInput.value; save(); render(); });
+  if(dcInput) dcInput.addEventListener('change', () => { currentPlayer().dreamClub = dcInput.value; touch(); render(); });
   const dlInput = root.querySelector('#dream-league-input');
-  if(dlInput) dlInput.addEventListener('change', () => { currentPlayer().dreamLeague = dlInput.value; save(); });
+  if(dlInput) dlInput.addEventListener('change', () => { currentPlayer().dreamLeague = dlInput.value; touch(); });
 
   const addYearBtn = root.querySelector('[data-action="add-year"]');
-  if(addYearBtn) addYearBtn.addEventListener('click', () => { currentPlayer().years.push(emptyYear()); save(); render(); });
+  if(addYearBtn) addYearBtn.addEventListener('click', () => { currentPlayer().years.push(emptyYear()); touch(); render(); });
 
   root.querySelectorAll('tbody tr[data-year-id]').forEach(tr => {
     const year = currentPlayer().years.find(y => y.id === tr.dataset.yearId);
     tr.querySelectorAll('[data-field]').forEach(inp => {
       inp.addEventListener('change', () => {
         year[inp.dataset.field] = inp.value;
-        save();
+        touch();
         if(inp.dataset.field === 'matches' || inp.dataset.field === 'note') render();
       });
     });
@@ -652,42 +669,49 @@ function attachEvents(){
     el.addEventListener('click', () => {
       const p = currentPlayer();
       p.years = p.years.filter(y => y.id !== el.dataset.id);
-      save(); render();
+      touch(); render();
     });
   });
 
   const addGoalBtn = root.querySelector('[data-action="add-goal"]');
-  if(addGoalBtn) addGoalBtn.addEventListener('click', () => { currentPlayer().goals.push(emptyGoal("")); save(); render(); });
+  if(addGoalBtn) addGoalBtn.addEventListener('click', () => { currentPlayer().goals.push(emptyGoal("")); touch(); render(); });
   root.querySelectorAll('.goal-row').forEach(row => {
     const goal = currentPlayer().goals.find(g => g.id === row.dataset.goalId);
     const ta = row.querySelector('[data-field="goal-text"]');
-    if(ta) ta.addEventListener('change', () => { goal.text = ta.value; save(); });
+    if(ta) ta.addEventListener('change', () => { goal.text = ta.value; touch(); });
   });
   root.querySelectorAll('[data-action="delete-goal"]').forEach(el => {
     el.addEventListener('click', () => {
       const p = currentPlayer();
       p.goals = p.goals.filter(g => g.id !== el.dataset.id);
-      save(); render();
+      touch(); render();
     });
   });
 }
 
 render();
 
-/* Auto-load data.json for first-time visitors (e.g. someone you shared the link with) */
-if(!hasOwnData){
-  fetch('data.json', { cache: 'no-store' })
-    .then(res => res.ok ? res.json() : null)
-    .then(parsed => {
-      if(Array.isArray(parsed) && parsed.length){
-        state.players = parsed;
-        state.playerId = parsed[0].id;
-        save();
-        render();
-      }
-    })
-    .catch(() => {});
-}
+/* Always check in the background whether data.json on the repo is newer than what's
+   currently loaded, and silently switch to it if so. Local edits are never overwritten
+   by an OLDER copy — only a genuinely newer export wins. Same link works for everyone. */
+fetch('data.json', { cache: 'no-store' })
+  .then(res => res.ok ? res.json() : null)
+  .then(parsed => {
+    if(!parsed) return;
+    const players = Array.isArray(parsed) ? parsed : parsed.players;
+    const remoteUpdatedAt = Array.isArray(parsed) ? null : parsed.updatedAt;
+    if(!Array.isArray(players) || !players.length) return;
+    const remoteTime = remoteUpdatedAt ? new Date(remoteUpdatedAt).getTime() : 0;
+    const localTime = state.updatedAt ? new Date(state.updatedAt).getTime() : -1;
+    if(remoteTime > localTime){
+      state.players = players;
+      state.updatedAt = remoteUpdatedAt || new Date().toISOString();
+      state.playerId = players[0].id;
+      save();
+      render();
+    }
+  })
+  .catch(() => {});
 
 /* ---------- PWA: service worker (static file, manifest linked in <head>) ---------- */
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
