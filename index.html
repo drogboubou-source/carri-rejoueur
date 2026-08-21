@@ -207,6 +207,24 @@ function syncStatusText(){
 function getPayload(){
   return { updatedAt: state.updatedAt, players: state.players };
 }
+async function fetchSharedData(){
+  const res = await fetch(`data.json?v=${Date.now()}`, { cache: 'no-store' });
+  if(!res.ok) throw new Error('not found');
+  const parsed = await res.json();
+  const players = Array.isArray(parsed) ? parsed : parsed.players;
+  if(!Array.isArray(players) || !players.length) throw new Error('empty');
+  return {
+    players,
+    updatedAt: Array.isArray(parsed) ? new Date().toISOString() : (parsed.updatedAt || new Date().toISOString())
+  };
+}
+function applySharedData(shared){
+  state.players = shared.players;
+  state.updatedAt = shared.updatedAt;
+  state.playerId = shared.players[0].id;
+  save();
+  render();
+}
 function encodeBase64(str){
   const bytes = new TextEncoder().encode(str);
   let bin = "";
@@ -700,16 +718,7 @@ function attachEvents(){
   if(loadRepoBtn) loadRepoBtn.addEventListener('click', async () => {
     loadRepoBtn.textContent = '⟳ Chargement...';
     try{
-      const res = await fetch('data.json', { cache: 'no-store' });
-      if(!res.ok) throw new Error('not found');
-      const parsed = await res.json();
-      const players = Array.isArray(parsed) ? parsed : parsed.players;
-      if(!Array.isArray(players) || !players.length) throw new Error('empty');
-      state.players = players;
-      state.updatedAt = Array.isArray(parsed) ? new Date().toISOString() : (parsed.updatedAt || new Date().toISOString());
-      state.playerId = players[0].id;
-      save();
-      render();
+      applySharedData(await fetchSharedData());
     } catch(err){
       alert("Impossible de trouver data.json à la racine du site. Vérifie qu'il a bien été ajouté au repo.");
       loadRepoBtn.textContent = '⟳ Charger depuis le repo';
@@ -804,26 +813,10 @@ function attachEvents(){
 
 render();
 
-/* Always check in the background whether data.json on the repo is newer than what's
-   currently loaded, and silently switch to it if so. Local edits are never overwritten
-   by an OLDER copy — only a genuinely newer export wins. Same link works for everyone. */
-fetch('data.json', { cache: 'no-store' })
-  .then(res => res.ok ? res.json() : null)
-  .then(parsed => {
-    if(!parsed) return;
-    const players = Array.isArray(parsed) ? parsed : parsed.players;
-    const remoteUpdatedAt = Array.isArray(parsed) ? null : parsed.updatedAt;
-    if(!Array.isArray(players) || !players.length) return;
-    const remoteTime = remoteUpdatedAt ? new Date(remoteUpdatedAt).getTime() : 0;
-    const localTime = state.updatedAt ? new Date(state.updatedAt).getTime() : -1;
-    if(remoteTime > localTime){
-      state.players = players;
-      state.updatedAt = remoteUpdatedAt || new Date().toISOString();
-      state.playerId = players[0].id;
-      save();
-      render();
-    }
-  })
+/* On the shared GitHub Pages link, data.json is the source of truth. Always load it
+   on startup so visitors see the latest exported file instead of an old local copy. */
+fetchSharedData()
+  .then(applySharedData)
   .catch(() => {});
 
 /* ---------- PWA: service worker (static file, manifest linked in <head>) ---------- */
