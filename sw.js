@@ -1,5 +1,5 @@
-const CACHE = 'carriere-v5';
-const CORE_ASSETS = ['./', './index.html', './manifest.json'];
+const CACHE = 'carriere-v6';
+const CORE_ASSETS = ['./', './index.html', './manifest.json', './sync-config.js'];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

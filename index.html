@@ -38,6 +38,9 @@
   .io-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
   .io-btn{background:var(--panel);border:1px solid var(--border);color:var(--text-secondary);padding:5px 12px;border-radius:8px;font-size:11px;cursor:pointer;display:inline-block;}
   .io-btn:hover{color:var(--text);border-color:var(--blue);}
+  .sync-status{width:100%;text-align:center;color:var(--text-muted);font-size:10px;margin-top:-8px;}
+  .sync-status.ok{color:var(--green);}
+  .sync-status.err{color:var(--red);}
   .link-btn{background:transparent;border:none;color:var(--text-secondary);font-size:11px;text-decoration:underline;padding:0;}
 
   /* HERO BANNER */
@@ -161,6 +164,7 @@
 </div>
 <div id="root"></div>
 
+<script src="sync-config.js"></script>
 <script>
 /* ---------- Utils ---------- */
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -183,6 +187,73 @@ function save(){
 function touch(){
   state.updatedAt = new Date().toISOString();
   save();
+}
+
+/* ---------- Shared-link publishing ---------- */
+const SYNC_CONFIG = window.CARRIERE_SYNC || {};
+const GITHUB_TOKEN_KEY = 'fifaCareerGithubToken';
+
+function syncRepoReady(){
+  return SYNC_CONFIG.provider === 'github' && SYNC_CONFIG.owner && SYNC_CONFIG.repo && SYNC_CONFIG.path;
+}
+function syncStatusText(){
+  if(!syncRepoReady()) return "Sync GitHub non configuree : remplis sync-config.js pour publier sur ton lien.";
+  return `Sync GitHub prete : ${SYNC_CONFIG.owner}/${SYNC_CONFIG.repo}/${SYNC_CONFIG.path}`;
+}
+function getPayload(){
+  return { updatedAt: state.updatedAt, players: state.players };
+}
+function encodeBase64(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  bytes.forEach(b => { bin += String.fromCharCode(b); });
+  return btoa(bin);
+}
+function getGithubToken(){
+  let token = localStorage.getItem(GITHUB_TOKEN_KEY) || "";
+  if(token) return token;
+  token = prompt("Colle ton token GitHub pour publier data.json. Il sera garde seulement sur cet appareil.");
+  if(token) localStorage.setItem(GITHUB_TOKEN_KEY, token.trim());
+  return token ? token.trim() : "";
+}
+async function githubApi(path, options){
+  const token = getGithubToken();
+  if(!token) throw new Error("no token");
+  const res = await fetch(`https://api.github.com${path}`, {
+    ...options,
+    headers: {
+      "Accept": "application/vnd.github+json",
+      "Authorization": `Bearer ${token}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+      ...(options && options.headers ? options.headers : {})
+    }
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok) throw new Error(data.message || `GitHub HTTP ${res.status}`);
+  return data;
+}
+async function publishToGithub(){
+  if(!syncRepoReady()){
+    alert("Remplis d'abord sync-config.js avec owner, repo, branch et path.");
+    return;
+  }
+  touch();
+  const owner = SYNC_CONFIG.owner;
+  const repo = SYNC_CONFIG.repo;
+  const branch = SYNC_CONFIG.branch || "main";
+  const filePath = SYNC_CONFIG.path || "data.json";
+  const encodedPath = filePath.split('/').map(encodeURIComponent).join('/');
+  const meta = await githubApi(`/repos/${owner}/${repo}/contents/${encodedPath}?ref=${encodeURIComponent(branch)}`, { method: "GET" });
+  const content = JSON.stringify(getPayload(), null, 2) + "\n";
+  await githubApi(`/repos/${owner}/${repo}/contents/${encodedPath}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      message: `Update shared career data ${state.updatedAt}`,
+      content: encodeBase64(content),
+      sha: meta.sha,
+      branch
+    })
+  });
 }
 
 function migrateOld(){
@@ -503,10 +574,13 @@ function render(){
     <div class="footer-tag">★ Un rêve, un ballon, une légende à écrire ★</div>
 
     <div class="io-row" style="justify-content:center;margin-top:18px;">
+      <button class="io-btn" data-action="publish-shared">Publier sur le lien partage</button>
       <button class="io-btn" data-action="export-data">⇩ Exporter data.json</button>
       <button class="io-btn" data-action="load-from-repo">⟳ Charger depuis le repo</button>
       <label class="io-btn" for="import-file-input">⇧ Importer un fichier</label>
+      <button class="io-btn" data-action="forget-token">Oublier le token</button>
       <input type="file" id="import-file-input" accept="application/json" style="display:none" />
+      <div id="sync-status" class="sync-status">${esc(syncStatusText())}</div>
     </div>
   `;
 
@@ -573,7 +647,7 @@ function attachEvents(){
   const exportBtn = root.querySelector('[data-action="export-data"]');
   if(exportBtn) exportBtn.addEventListener('click', () => {
     touch(); // stamp "now" as the export moment, so viewers can tell this is newer
-    const payload = { updatedAt: state.updatedAt, players: state.players };
+    const payload = getPayload();
     const data = JSON.stringify(payload, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -584,6 +658,37 @@ function attachEvents(){
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+  });
+  const publishBtn = root.querySelector('[data-action="publish-shared"]');
+  const syncStatus = root.querySelector('#sync-status');
+  if(publishBtn) publishBtn.addEventListener('click', async () => {
+    publishBtn.textContent = 'Publication...';
+    publishBtn.disabled = true;
+    if(syncStatus) syncStatus.className = 'sync-status';
+    try{
+      await publishToGithub();
+      if(syncStatus){
+        syncStatus.textContent = "Donnees publiees. Les visiteurs du lien verront la mise a jour apres rafraichissement.";
+        syncStatus.className = 'sync-status ok';
+      }
+      publishBtn.textContent = 'Publie';
+      setTimeout(() => { publishBtn.textContent = 'Publier sur le lien partage'; publishBtn.disabled = false; }, 1800);
+    } catch(err){
+      if(syncStatus){
+        syncStatus.textContent = `Publication impossible : ${err.message || err}`;
+        syncStatus.className = 'sync-status err';
+      }
+      publishBtn.textContent = 'Publier sur le lien partage';
+      publishBtn.disabled = false;
+    }
+  });
+  const forgetTokenBtn = root.querySelector('[data-action="forget-token"]');
+  if(forgetTokenBtn) forgetTokenBtn.addEventListener('click', () => {
+    localStorage.removeItem(GITHUB_TOKEN_KEY);
+    if(syncStatus){
+      syncStatus.textContent = "Token oublie sur cet appareil.";
+      syncStatus.className = 'sync-status ok';
+    }
   });
   const loadRepoBtn = root.querySelector('[data-action="load-from-repo"]');
   if(loadRepoBtn) loadRepoBtn.addEventListener('click', async () => {
