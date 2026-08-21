@@ -127,6 +127,9 @@
   @media (max-width:820px){ .ref-grid{grid-template-columns:1fr;} }
   .ref-grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-bottom:12px;}
   @media (max-width:820px){ .ref-grid2{grid-template-columns:1fr;} }
+  .ref-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;}
+  @media (max-width:820px){ .ref-grid3{grid-template-columns:1fr;} }
+  .ref-col{display:flex;flex-direction:column;gap:12px;}
   .ref-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:11.5px;}
   .ref-row:last-child{border-bottom:none;}
   .ref-label{color:var(--text-secondary);}
@@ -322,6 +325,18 @@ const BONUS_RULES = [
   ["Carton rouge", "-5 / -3 / -1", "neg"],
   ["Carton jaune", "-3 / -2 / -1", "neg"],
 ];
+const OBJECTIFS_RULES = [
+  ["Champion", "+2", "pos"],
+  ["Promotion", "+1", "pos"],
+  ["Coupe National", "+1", "pos"],
+  ["Coupe Continental", "+3 / +2 / +1", "pos"],
+  ["Meilleur buteur/Passeur championnat", "+1", "pos"],
+  ["Joueur de l'Année", "+1", "pos"],
+  ["Objectif Global", "+0,5", "pos"],
+  ["Relégation", "-1", "neg"],
+  ["Dernier", "-2", "neg"],
+  ["Carton rouge/jaune", "-0,5", "neg"],
+];
 
 /* ---------- Render ---------- */
 function render(){
@@ -437,40 +452,44 @@ function render(){
       </div>
     </div>
 
-    <div class="ref-grid">
-      ${refCard("var(--blue)", "Évolution du potentiel", POTENTIAL_RULES.map(r => refRow(r[0], r[1], r[2])).join(""))}
-      ${refCard("var(--blue)", "Objectif entraînement", TRAINING_RULES.map(r => refRow(r[0], r[1])).join(""))}
-      ${refCard("var(--pink)", "Contrat &amp; transfert", TRANSFER_RULES.map(r => `<div class="ref-row" style="align-items:flex-start"><span class="ref-label" style="min-width:100px">${esc(r[0])}</span><span class="ref-value" style="font-size:11px">${esc(r[1])}</span></div>`).join(""))}
-    </div>
-
-    <div class="ref-grid2">
-      ${refCard("var(--gold)", "Bonus &amp; malus de carrière", BONUS_RULES.map(r => refRow(r[0], r[1], r[2])).join(""))}
-      <div class="card">
-        <div class="card-head"><span class="dot" style="background:var(--purple)"></span><span class="card-title">Compétences &amp; développement</span></div>
-        <div class="card-body">
-          <div class="skill-row">
-            <div class="skill-col">
-              <div class="skill-col-title">Geste technique</div>
-              <div class="skill-chips">
-                <div class="skill-chip">60<br/>(2)</div>
-                <div class="skill-chip">70<br/>(3)</div>
-                <div class="skill-chip">80<br/>(4)</div>
-                <div class="skill-chip">90<br/>(5)</div>
+    <div class="ref-grid3">
+      <div class="ref-col">
+        ${refCard("var(--blue)", "Évolution du potentiel", POTENTIAL_RULES.map(r => refRow(r[0], r[1], r[2])).join(""))}
+        ${refCard("var(--gold)", "Bonus &amp; malus de carrière", BONUS_RULES.map(r => refRow(r[0], r[1], r[2])).join(""))}
+      </div>
+      <div class="ref-col">
+        ${refCard("var(--blue)", "Objectif entraînement", TRAINING_RULES.map(r => refRow(r[0], r[1])).join(""))}
+        <div class="card">
+          <div class="card-head"><span class="dot" style="background:var(--purple)"></span><span class="card-title">Compétences &amp; développement</span></div>
+          <div class="card-body">
+            <div class="skill-row">
+              <div class="skill-col">
+                <div class="skill-col-title">Geste technique</div>
+                <div class="skill-chips">
+                  <div class="skill-chip">60<br/>(2)</div>
+                  <div class="skill-chip">70<br/>(3)</div>
+                  <div class="skill-chip">80<br/>(4)</div>
+                  <div class="skill-chip">90<br/>(5)</div>
+                </div>
+                <div class="skill-note">Pareil pour le mauvais pied</div>
               </div>
-              <div class="skill-note">Pareil pour le mauvais pied</div>
-            </div>
-            <div class="skill-col">
-              <div class="skill-col-title">Archétype</div>
-              <div class="skill-chips">
-                <div class="skill-chip">⚡</div>
-                <div class="skill-chip">🎯</div>
-                <div class="skill-chip">🛡</div>
-                <div class="skill-chip">🧠</div>
+              <div class="skill-col">
+                <div class="skill-col-title">Archétype</div>
+                <div class="skill-chips">
+                  <div class="skill-chip">⚡</div>
+                  <div class="skill-chip">🎯</div>
+                  <div class="skill-chip">🛡</div>
+                  <div class="skill-chip">🧠</div>
+                </div>
+                <div class="skill-note">Pareil pour les archétypes</div>
               </div>
-              <div class="skill-note">Pareil pour les archétypes</div>
             </div>
           </div>
         </div>
+      </div>
+      <div class="ref-col">
+        ${refCard("var(--pink)", "Contrat &amp; transfert", TRANSFER_RULES.map(r => `<div class="ref-row" style="align-items:flex-start"><span class="ref-label" style="min-width:100px">${esc(r[0])}</span><span class="ref-value" style="font-size:11px">${esc(r[1])}</span></div>`).join(""))}
+        ${refCard("var(--green)", "Objectifs", OBJECTIFS_RULES.map(r => refRow(r[0], r[1], r[2])).join(""))}
       </div>
     </div>
 
