@@ -241,6 +241,9 @@ function handlePhotoError(img){
     const banner = img.closest('.banner');
     banner.classList.remove('has-photo');
     img.closest('.photo-bleed').style.display = 'none';
+    const fb = banner.querySelector('.avatar-fallback');
+    if(fb) fb.style.display = 'flex';
+  }
 }
 
 const FLAG_EXTS = ['jpg','jpeg','webp','svg'];
