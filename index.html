@@ -79,7 +79,7 @@
   .card-body{padding:10px 12px;}
 
   .table-wrap{overflow-x:auto;}
-  table{border-collapse:collapse;width:100%;min-width:760px;font-size:12px;}
+  table{border-collapse:collapse;width:100%;min-width:900px;font-size:12px;}
   thead th{background:#0B1730;color:#9CC1FF;font-size:9.5px;text-transform:uppercase;letter-spacing:0.3px;font-weight:600;text-align:center;padding:10px 6px;border-bottom:1px solid var(--blue);white-space:nowrap;}
   tbody tr:nth-child(even){background:rgba(255,255,255,0.02);}
   tbody td{padding:9px 6px;border-bottom:1px solid var(--border);vertical-align:middle;text-align:center;}
@@ -97,6 +97,7 @@
   th.col-niveau,td.col-niveau,th.col-matchs,td.col-matchs,th.col-buts,td.col-buts,th.col-pd,td.col-pd,th.col-note,td.col-note{width:52px;}
   th.col-pot,td.col-pot{width:92px;}
   th.col-obj,td.col-obj{width:62px;}
+  th.col-bonus,td.col-bonus{width:150px;}
   th.col-contrat,td.col-contrat{width:66px;}
   .del-cell{width:26px;}
   .del-btn{background:transparent;border:none;color:var(--text-muted);font-size:14px;line-height:1;padding:2px;}
@@ -155,7 +156,7 @@
 <script>
 /* ---------- Utils ---------- */
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-const emptyYear = () => ({ id: uid(), age:"", club:"", niveau:"", potentiel:"", potentielDelta:"", matches:"", buts:"", pd:"", note:"", objectif:"", contrat:"" });
+const emptyYear = () => ({ id: uid(), age:"", club:"", niveau:"", potentiel:"", potentielDelta:"", matches:"", buts:"", pd:"", note:"", bonus:"", objectif:"", contrat:"" });
 const emptyGoal = (t) => ({ id: uid(), text: t || "" });
 const emptyPlayer = (n) => ({
   id: uid(), name: n || "Nouveau joueur",
@@ -181,7 +182,7 @@ function migrateOld(){
     years: (p.years||[]).map(y => ({
       id: y.id || uid(), age: y.age||"", club: y.club||"", niveau: y.niveau||"",
       potentiel: y.potentiel||"", potentielDelta:"", matches: y.matches||"",
-      buts: y.buts||"", pd: y.pd||"", note: y.note||"", objectif: y.objectif||"", contrat:"",
+      buts: y.buts||"", pd: y.pd||"", note: y.note||"", bonus:"", objectif: y.objectif||"", contrat:"",
     })),
   }));
 }
@@ -384,13 +385,14 @@ function render(){
                   <th class="col-buts">Buts</th>
                   <th class="col-pd">PD</th>
                   <th class="col-note">Note</th>
+                  <th class="col-bonus">Potentiel</th>
                   <th class="col-obj">Objectif</th>
                   <th class="col-contrat">Contrat</th>
                   <th class="del-cell"></th>
                 </tr>
               </thead>
               <tbody>
-                ${player.years.length ? player.years.map(yearRow).join("") : `<tr><td colspan="11" style="padding:16px;color:var(--text-muted)">Aucune année enregistrée.</td></tr>`}
+                ${player.years.length ? player.years.map(yearRow).join("") : `<tr><td colspan="12" style="padding:16px;color:var(--text-muted)">Aucune année enregistrée.</td></tr>`}
               </tbody>
               <tfoot>
                 <tr>
@@ -399,7 +401,7 @@ function render(){
                   <td>${t.buts}</td>
                   <td>${t.pd}</td>
                   <td>${t.matches ? fmtNote(t.avgNote) : "-"}</td>
-                  <td colspan="3"></td>
+                  <td colspan="4"></td>
                 </tr>
               </tfoot>
             </table>
@@ -498,6 +500,7 @@ function yearRow(y){
     <td class="col-buts"><input class="cell-input mono" type="number" min="0" data-field="buts" value="${esc(y.buts)}" placeholder="0" /></td>
     <td class="col-pd"><input class="cell-input mono" type="number" min="0" data-field="pd" value="${esc(y.pd)}" placeholder="0" /></td>
     <td class="col-note note-cell" style="color:${ratingColor(num(y.note))}"><input class="cell-input mono" type="number" min="0" max="10" step="0.1" data-field="note" value="${esc(y.note)}" placeholder="0" /></td>
+    <td class="col-bonus"><input class="cell-input" style="text-align:left" data-field="bonus" value="${esc(y.bonus)}" placeholder="Champion D4, Promu..." /></td>
     <td class="col-obj"><input class="cell-input" data-field="objectif" value="${esc(y.objectif)}" placeholder="0/4" /></td>
     <td class="col-contrat"><input class="cell-input" data-field="contrat" value="${esc(y.contrat)}" placeholder="-" /></td>
     <td class="del-cell"><button class="del-btn" data-action="delete-year" data-id="${y.id}" aria-label="Supprimer l'année">×</button></td>
