@@ -64,7 +64,7 @@
   .youtube-note{display:inline-flex;align-items:center;gap:7px;color:var(--text-secondary);font-size:12px;line-height:1;text-decoration:none;}
   .youtube-note:hover{color:var(--text);}
   .youtube-logo{width:22px;height:auto;display:block;flex-shrink:0;}
-  .mode-pill{display:inline-flex;align-items:center;background:var(--blue-dark);border:1px solid var(--blue);color:#9CC1FF;font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:0.5px;line-height:1;}
+  .mode-pill{display:inline-flex;align-items:center;min-height:22px;background:var(--blue-dark);border:1px solid var(--blue);color:#9CC1FF;font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:0.5px;line-height:1;flex-shrink:0;}
 
   .club-track{position:absolute;left:14px;top:108px;display:flex;align-items:flex-start;gap:28px;z-index:1;flex-wrap:nowrap;}
   .club-badge{display:flex;flex-direction:column;gap:6px;}
@@ -475,10 +475,10 @@ function render(){
         <div class="name-row">
           <input class="player-name" id="player-name-input" value="${esc(player.name)}" />
           <img class="name-flag" data-base="images/flag-${playerIndex+1}" data-ext-idx="0" src="images/flag-${playerIndex+1}.png" alt="Drapeau" onerror="handleFlagError(this)" />
+          <span class="mode-pill">Mode RP</span>
         </div>
         <div class="name-sub">
           <a class="youtube-note" href="https://www.youtube.com/playlist?list=PLKVh60VojKGE" target="_blank" rel="noopener noreferrer"><img class="youtube-logo" src="images/Youtube_logo.png" alt="YouTube" /> Vidéos des matchs</a>
-          <span class="mode-pill">Mode RP</span>
           ${state.players.length>1 ? `<button class="link-btn" data-action="delete-player">Supprimer ce joueur</button>` : ""}
         </div>
       </div>
