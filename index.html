@@ -233,6 +233,15 @@ function applySharedData(shared){
   save();
   render();
 }
+function dataTimestamp(data){
+  const time = data && data.updatedAt ? Date.parse(data.updatedAt) : 0;
+  return Number.isFinite(time) ? time : 0;
+}
+function applySharedDataIfNewer(shared){
+  if(dataTimestamp(shared) > dataTimestamp(state)){
+    applySharedData(shared);
+  }
+}
 function encodeBase64(str){
   const bytes = new TextEncoder().encode(str);
   let bin = "";
@@ -774,14 +783,19 @@ function attachEvents(){
   });
 
   const nameInput = root.querySelector('#player-name-input');
+  if(nameInput) nameInput.addEventListener('input', () => { currentPlayer().name = nameInput.value || currentPlayer().name; touch(); });
   if(nameInput) nameInput.addEventListener('change', () => { currentPlayer().name = nameInput.value || currentPlayer().name; touch(); render(); });
   const ccInput = root.querySelector('#current-club-input');
+  if(ccInput) ccInput.addEventListener('input', () => { currentPlayer().currentClub = ccInput.value; touch(); });
   if(ccInput) ccInput.addEventListener('change', () => { currentPlayer().currentClub = ccInput.value; touch(); render(); });
   const clInput = root.querySelector('#current-league-input');
+  if(clInput) clInput.addEventListener('input', () => { currentPlayer().currentLeague = clInput.value; touch(); });
   if(clInput) clInput.addEventListener('change', () => { currentPlayer().currentLeague = clInput.value; touch(); });
   const dcInput = root.querySelector('#dream-club-input');
+  if(dcInput) dcInput.addEventListener('input', () => { currentPlayer().dreamClub = dcInput.value; touch(); });
   if(dcInput) dcInput.addEventListener('change', () => { currentPlayer().dreamClub = dcInput.value; touch(); render(); });
   const dlInput = root.querySelector('#dream-league-input');
+  if(dlInput) dlInput.addEventListener('input', () => { currentPlayer().dreamLeague = dlInput.value; touch(); });
   if(dlInput) dlInput.addEventListener('change', () => { currentPlayer().dreamLeague = dlInput.value; touch(); });
 
   const addYearBtn = root.querySelector('[data-action="add-year"]');
@@ -790,6 +804,10 @@ function attachEvents(){
   root.querySelectorAll('tbody tr[data-year-id]').forEach(tr => {
     const year = currentPlayer().years.find(y => y.id === tr.dataset.yearId);
     tr.querySelectorAll('[data-field]').forEach(inp => {
+      inp.addEventListener('input', () => {
+        year[inp.dataset.field] = inp.value;
+        touch();
+      });
       inp.addEventListener('change', () => {
         year[inp.dataset.field] = inp.value;
         touch();
@@ -810,6 +828,7 @@ function attachEvents(){
   root.querySelectorAll('.goal-row').forEach(row => {
     const goal = currentPlayer().goals.find(g => g.id === row.dataset.goalId);
     const ta = row.querySelector('[data-field="goal-text"]');
+    if(ta) ta.addEventListener('input', () => { goal.text = ta.value; touch(); });
     if(ta) ta.addEventListener('change', () => { goal.text = ta.value; touch(); });
     const cb = row.querySelector('[data-field="goal-completed"]');
     if(cb) cb.addEventListener('change', () => { goal.completed = cb.checked; touch(); render(); });
@@ -825,10 +844,10 @@ function attachEvents(){
 
 render();
 
-/* On the shared GitHub Pages link, data.json is the source of truth. Always load it
-   on startup so visitors see the latest exported file instead of an old local copy. */
+/* Keep local edits after refresh. The shared data.json is loaded only when it is
+   newer than this browser's local copy. */
 fetchSharedData()
-  .then(applySharedData)
+  .then(applySharedDataIfNewer)
   .catch(() => {});
 
 /* ---------- PWA: service worker (static file, manifest linked in <head>) ---------- */
